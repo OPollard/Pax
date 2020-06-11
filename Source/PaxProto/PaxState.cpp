@@ -108,8 +108,8 @@ bool UPaxState::SpawnMoney()
 {
 	if (MoneyActor)
 	{
-		FVector SpawnLocation = (GetOwner()->GetActorLocation()) + FVector(0, 0, 100);
-		FRotator SpawnRotation = FRotator(0, 0, 0);
+		FVector SpawnLocation = (GetOwner()->GetActorLocation()) + FVector(0, 5, 100);
+		FRotator SpawnRotation = FRotator(45, 0,0);
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.Owner = GetOwner();
 		AMoney* SpawnedMoney = GetWorld()->SpawnActor<AMoney>(MoneyActor, SpawnLocation, SpawnRotation, SpawnParameters);
