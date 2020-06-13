@@ -122,7 +122,13 @@ public:
 	FText GetMoneyAsText();
 	float GetMoney();
 	void SetMoney(float x);
+
+	void ResetDeltaSum();
 	int GetDeltaSum();
+
+	void SetAwaitingPickUp(bool x);
+	bool GetAwaitingPickup();
+
 
 	bool IsAlive();
 	
@@ -150,8 +156,10 @@ private:
 	float SocialBias{ 0.0f };
 
 	int Delta{ 0 };
+	int WealthAdjustment{ 0 };
 	int DeltaSum{ 0 };
-	int MoneyDropLimit{ 100 };
+	int MoneyDropLimit{ 0 };
+	float DrainDatum{ 0.0f };
 
 	
 	

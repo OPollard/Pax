@@ -53,7 +53,12 @@ void UPaxState::Initialise()
 	case RICH: Money = START_MONEY_RICH; break;
 	default: Money = START_MONEY_AVG;
 	}
-	
+	//Allows richer pax to drop more money, by manipulating all future delta numbers
+	WealthAdjustment = Money / START_MONEY_POOR;
+	//Maximum amount possible to drop to allow PAX to hit 0 money on landing if all stats are 0
+	DrainDatum = Money / LVL1_PLAYTIME;
+	//Adjust drop limit so that it takes longer for richer people to drop as their delta increases faster
+	MoneyDropLimit = CASH_DROP * (WealthAdjustment); 
 }
 
 // Called every second from Pax.cpp
@@ -81,8 +86,8 @@ void UPaxState::UpdateCores()
 		//if DeltaSum is below spawn threshold
 		if (DeltaSum < MoneyDropLimit)
 		{
-			//higher stats the better the delta, excrement is best at 0, represents a ratio of maximum best stats and makes that a ratio of money drain
-			Delta = (int)(((Nutrition + Energy + (FMath::Abs(Excrement - 100.0f) + Societal)) / 400) * MONEY_DRAIN);
+			//higher stats the better the delta, excrement is best at 0, represents a ratio of maximum best stats and makes that a ratio of maximum earnable per tick
+			Delta = (int)(((Nutrition + Energy + (FMath::Abs(Excrement - 100.0f) + Societal)) / 400) * DrainDatum);
 			DeltaSum += Delta;
 			if (DeltaSum > MoneyDropLimit) { DeltaSum = MoneyDropLimit; }
 		}
@@ -91,12 +96,8 @@ void UPaxState::UpdateCores()
 			//if( !awaiting a pickup)
 			if (!AwaitingPickup)
 			{
-				//FPaxDelegate.MoneyDrop(broadcast)
 				//if spawn successful, set awaiting pickup true to avoid more spawns
-				AwaitingPickup = (SpawnMoney()) ? true : false;
-				//CURSOR OVERHEAD ACTOR WILL TRIGGER EVENT TO CABIN MANAGER TO SUM TOTAL LEVEL EARNINGS, WILL ALSO REDUCE PAX MONEY
-				//get overhead action to re-trigger this for not awaiting pickup back to false
-				//set end awaiting a pickup as true;
+				AwaitingPickup = (SpawnMoney()) ? true : false;	
 			}
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Delta: %i"), DeltaSum);
@@ -104,6 +105,7 @@ void UPaxState::UpdateCores()
 	
 }
 
+//spawn money overhead PAX, and await cursor ahead. Functionality in money.cpp
 bool UPaxState::SpawnMoney()
 {
 	if (MoneyActor)
@@ -244,9 +246,24 @@ void UPaxState::SetMoney(float x)
 	Money = x;
 }
 
+void UPaxState::ResetDeltaSum()
+{
+	DeltaSum = 0;
+}
+
 int UPaxState::GetDeltaSum()
 {
 	return DeltaSum;
+}
+
+void UPaxState::SetAwaitingPickUp(bool x)
+{
+	AwaitingPickup = x;
+}
+
+bool UPaxState::GetAwaitingPickup()
+{
+	return AwaitingPickup;
 }
 
 bool UPaxState::IsAlive()

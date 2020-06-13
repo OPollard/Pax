@@ -10,7 +10,7 @@
 #define INFLUENCE_RANGE 90.0f
 
 //Pax State
-#define NUTRITION_CHX_AVG -2.0f;
+#define NUTRITION_CHX_AVG -0.2f; // 2.0f
 #define ENERGY_CHX_AVG -0.5f;
 #define EXCREMENT_CHX_AVG 0.25f;
 #define SOCIAL_CHX_AVG 0.0f;
@@ -21,5 +21,7 @@
 #define START_MONEY_RICH 10000.0f
 
 // Money - ref Pax State
-#define MONEY_DRAIN 10.0f
 #define CASH_DROP 100.0f
+
+// Level Times
+#define LVL1_PLAYTIME 300.0f
