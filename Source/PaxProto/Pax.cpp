@@ -11,7 +11,6 @@
 #include "Toilet.h"
 #include "PaxState.h"
 #include "Constants.h"
-
 #include "Door.h"
 
 // Sets default values
