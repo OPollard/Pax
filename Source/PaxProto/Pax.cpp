@@ -127,22 +127,17 @@ void APax::ManageTarget(AActor* Target)
 	//if target is seat
 	if (TargetSeat)
 	{
-		//occupied
-		if (TargetSeat->GetOccupied())
-		{
-			if (CurrentSeat)
-			{
-				SetDeployLocation(CurrentSeat->GetActorLocation());
-			}
-		}
 		//empty seat
-		else
+		if(!TargetSeat->GetOccupied())
 		{
-			if (CurrentSeat)
+			//do additional checks to avoid it occupying a seat but never making it due to path
+
+			//stands pax up off seat if seat is further away then next to it
+			if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
 			{
-				CurrentSeat->SetOccupied(false);
+				this->SetActorLocation(this->GetActorLocation() + FVector(0.0f, 40.0f, 0.0f));
 			}
-			TargetSeat->SetOccupied(true);
+
 			SetDeployLocation(TargetSeat->GetActorLocation());
 		}
 	}
@@ -170,7 +165,7 @@ void APax::AdaptSpeeds()
 	State->SetAnimPlaySpeed(Pax_Movement->MaxWalkSpeed);
 }
 
-// PER TICK :Recieves overlap actors, calculates social bias
+// PER TICK :Receives overlap actors, calculates social bias
 void APax::SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors)
 {
 	if (FoundActors)
@@ -232,6 +227,10 @@ void APax::TargetAcquiring()
 				State->SetMoving(false);
 				State->SetSitting(true);
 
+				//2 new lines
+				TargetSeat->SetOccupied(true);
+				this->SetCanAffectNavigationGeneration(false);
+
 				//snap to seat
 				this->SetActorLocation(TargetSeat->GetActorLocation());
 				this->SetActorRotation(FRotator(0, -90, 0));
@@ -242,6 +241,10 @@ void APax::TargetAcquiring()
 			else
 			{
 				State->SetSitting(false);
+
+				//2 new lines
+				TargetSeat->SetOccupied(false);
+				this->SetCanAffectNavigationGeneration(true);
 			}
 
 	}
@@ -253,6 +256,9 @@ void APax::TargetAcquiring()
 			State->SetMoving(false); // maybe set moving
 			State->SetSitting(true);
 
+			//occupancy
+			CurrentSeat->SetOccupied(true);
+
 			//snap to seat
 			this->SetActorLocation(CurrentSeat->GetActorLocation());
 			this->SetActorRotation(FRotator(0, -90, 0));
@@ -260,6 +266,9 @@ void APax::TargetAcquiring()
 		else
 		{
 			State->SetSitting(false);
+
+			//occupancy
+			CurrentSeat->SetOccupied(false);
 		}
 	}
 

@@ -100,7 +100,7 @@ void UPaxState::UpdateCores()
 				AwaitingPickup = (SpawnMoney()) ? true : false;	
 			}
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Delta: %i"), DeltaSum);
+		//UE_LOG(LogTemp, Warning, TEXT("Delta: %i"), DeltaSum);
 	}
 	
 }
