@@ -187,6 +187,17 @@ void UPaxState::ResetStates()
 	InToilet = false;
 }
 
+//Is pax onboard or off
+void UPaxState::SetOnboard(bool x)
+{
+	Onboard = x;
+}
+
+bool UPaxState::GetOnboard()
+{
+	return Onboard;
+}
+
 //Is pax sitting in a seat
 void UPaxState::SetSitting(bool x)
 {

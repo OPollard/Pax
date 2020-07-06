@@ -10,6 +10,7 @@
 class ASeat;
 class AToilet;
 class UPaxState;
+class ACabinManager;
 
 UCLASS()
 class PAXPROTO_API APax : public ACharacter
@@ -21,6 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+
 	// Sets default values for this character's properties
 	APax();
 	// Called every frame
@@ -79,6 +81,7 @@ private:
 	ASeat* CurrentSeat = nullptr;
 	AToilet* Toilet = nullptr;
 	UPaxState* State = nullptr;
+	ACabinManager* Manager = nullptr;
 
 	FTimerHandle PaxTimerHandle;
 

@@ -7,11 +7,14 @@
 #include "TimerManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Math/UnrealMathUtility.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Seat.h"
 #include "Toilet.h"
 #include "PaxState.h"
 #include "Constants.h"
 #include "Door.h"
+#include "CabinManager.h"
 
 // Sets default values
 APax::APax()
@@ -35,6 +38,7 @@ void APax::BeginPlay()
 
 	//Timer on repeat to enable attributes to change with time
 	GetWorldTimerManager().SetTimer(PaxTimerHandle, this, &APax::UpdateState, 1.0f, true, 0.0f);
+	
 }
 
 // Called every frame - refactor in future
@@ -132,13 +136,21 @@ void APax::ManageTarget(AActor* Target)
 		{
 			//do additional checks to avoid it occupying a seat but never making it due to path
 
-			//stands pax up off seat if seat is further away then next to it
+			//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
 			if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
 			{
-				this->SetActorLocation(this->GetActorLocation() + FVector(0.0f, 40.0f, 0.0f));
+				if (CurrentSeat)
+				{
+					this->SetActorLocation(this->GetActorLocation() + FVector(0.0f, 40.0f, 0.0f));
+				}
 			}
 
 			SetDeployLocation(TargetSeat->GetActorLocation());
+
+			//Cabin Manager needs to know about the new pax ONBOARD
+			Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
+			if (Manager) Manager->RegisterNewPax(this);
+
 		}
 	}
 	

@@ -104,6 +104,9 @@ public:
 	// Status Functions	///
 	void ResetStates();
 
+	void SetOnboard(bool x);
+	bool GetOnboard();
+
 	void SetSitting(bool x);
 	bool GetSitting();
 
@@ -143,6 +146,7 @@ private:
 	EWealth Wealthiness;
 	float Money{ 0.0f };
 
+	bool Onboard{ false };
 	bool Sitting;
 	bool Floating;
 	bool Moving;
