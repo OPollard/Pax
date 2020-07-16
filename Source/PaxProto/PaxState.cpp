@@ -64,10 +64,16 @@ void UPaxState::Initialise()
 // Called every second from Pax.cpp
 void UPaxState::UpdateCores()
 {
+
+	//Temporary Setting of Indicators
+	NutritionChx = NUTRITION_CHX_AVG;
+	EnergyChx = ENERGY_CHX_AVG;
+	ExcrementChx = EXCREMENT_CHX_AVG;
+
 	//Update Attributes
-	Nutrition += NUTRITION_CHX_AVG;
-	Energy += ENERGY_CHX_AVG;
-	Excrement += EXCREMENT_CHX_AVG;
+	Nutrition += NutritionChx;
+	Energy += EnergyChx;
+	Excrement += ExcrementChx;
 	Societal += SocialBias;
 
 	//If not alive
@@ -148,15 +154,36 @@ float UPaxState::GetNutrition()
 	return Nutrition;
 }
 
+int32 UPaxState::GetNutritionIndicator()
+{
+	if (NutritionChx > 0.0f) return SMALLINCREASE;
+	else if (NutritionChx < 0.0f) return SMALLDECREASE;
+	else { return NOCHANGE; }
+}
+
 float UPaxState::GetExcrement()
 {
 	return Excrement;
 }
+int32 UPaxState::GetExcrementIndicator()
+{
+	if (ExcrementChx > 0.0f) return SMALLINCREASE;
+	else if (ExcrementChx < 0.0f) return SMALLDECREASE;
+	else { return NOCHANGE; }
+}
+
 
 float UPaxState::GetSocietal()
 {
 	return Societal;
 }
+int32 UPaxState::GetSocialIndicator()
+{
+	if (SocialBias > 0.0f) return SMALLINCREASE;
+	else if (SocialBias < 0.0f) return SMALLDECREASE;
+	else { return NOCHANGE; }
+}
+
 
 void UPaxState::SetSocialBias(float x)
 {
@@ -167,6 +194,13 @@ float UPaxState::GetEnergy()
 {
 	return Energy;
 }
+int32 UPaxState::GetEnergyIndicator()
+{
+	if (EnergyChx > 0.0f) return SMALLINCREASE;
+	else if (EnergyChx < 0.0f) return SMALLDECREASE;
+	else { return NOCHANGE; }
+}
+
 
 float UPaxState::GetAnimPlaySpeed()
 {

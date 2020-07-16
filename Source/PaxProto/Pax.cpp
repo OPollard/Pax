@@ -148,8 +148,12 @@ void APax::ManageTarget(AActor* Target)
 			SetDeployLocation(TargetSeat->GetActorLocation());
 
 			//Cabin Manager needs to know about the new pax ONBOARD
-			Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
-			if (Manager) Manager->RegisterNewPax(this);
+			if (!State->GetOnboard())
+			{
+				Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
+				if (Manager) Manager->RegisterNewPax(this);
+				if (State) State->SetOnboard(true);
+			}
 
 		}
 	}

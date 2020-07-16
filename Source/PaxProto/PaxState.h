@@ -42,6 +42,18 @@ enum EWealth
 	NUMOFWEALTH
 };
 
+UENUM()
+enum EIndicator
+{
+	LARGEDECREASE = -2,
+	SMALLDECREASE = -1,
+	NOCHANGE = 0,
+	SMALLINCREASE = 1,
+	LARGEINCREASE = 2,
+
+	NUMOFINDICATORS
+};
+
 //Preprocessor Directive to construct a MACRO DELEGATE where this name is found
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPaxDelegate);
 
@@ -82,19 +94,30 @@ public:
 	UFUNCTION(BlueprintPure)
 		FString GetName();
 
+	//Change indicator code so that it returns a state of increase or
+	//decrease such as big decrease -2, small decrease -1, neutral 0 etc
 	UFUNCTION(BlueprintPure)
 		float GetNutrition();
+	UFUNCTION(BlueprintPure)
+		int32 GetNutritionIndicator();
 
 	UFUNCTION(BlueprintPure)
 		float GetExcrement();
+	UFUNCTION(BlueprintPure)
+		int32 GetExcrementIndicator();
 
 	UFUNCTION(BlueprintPure)
 		float GetSocietal();
-
+	UFUNCTION(BlueprintPure)
+		int32 GetSocialIndicator();
 	void SetSocialBias(float x);
 
 	UFUNCTION(BlueprintPure)
 		float GetEnergy();
+	UFUNCTION(BlueprintPure)
+		int32 GetEnergyIndicator();
+	
+	
 
 	UFUNCTION(BlueprintPure)
 		float GetAnimPlaySpeed();
@@ -132,11 +155,12 @@ public:
 	void SetAwaitingPickUp(bool x);
 	bool GetAwaitingPickup();
 
-
 	bool IsAlive();
 	
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<AMoney> MoneyActor;
+
+	
 
 private:
 
@@ -157,6 +181,11 @@ private:
 	float Energy{ 75.00f };
 	float Excrement{ 0.00f };
 	float Societal{ 50.00f };
+	
+	//Core Indicators
+	float NutritionChx{ 0.0f };
+	float EnergyChx{ 0.0f };
+	float ExcrementChx{ 0.0f };
 	float SocialBias{ 0.0f };
 
 	int Delta{ 0 };
