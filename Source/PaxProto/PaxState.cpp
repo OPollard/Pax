@@ -56,9 +56,9 @@ void UPaxState::Initialise()
 	//Allows richer pax to drop more money, by manipulating all future delta numbers
 	WealthAdjustment = Money / START_MONEY_POOR;
 	//Maximum amount possible to drop to allow PAX to hit 0 money on landing if all stats are 0
-	DrainDatum = Money / LVL1_PLAYTIME;
+	DrainDatum = Money / FREEFLIGHT_CRUISETIME;
 	//Adjust drop limit so that it takes longer for richer people to drop as their delta increases faster
-	MoneyDropLimit = CASH_DROP * (WealthAdjustment); 
+	MoneyDropLimit = CASH_DROP * WealthAdjustment; 
 }
 
 // Called every second from Pax.cpp

@@ -118,7 +118,6 @@ bool APax::GetViewStatInfo()
 void APax::UpdateState()
 {
 	State->UpdateCores();
-
 }
 
 //Checks what the target is, eg toilet, seat
