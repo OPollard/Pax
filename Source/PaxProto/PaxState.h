@@ -101,6 +101,7 @@ public:
 	UFUNCTION(BlueprintPure)
 		int32 GetNutritionIndicator();
 
+	void SetExcrement(float value);
 	UFUNCTION(BlueprintPure)
 		float GetExcrement();
 	UFUNCTION(BlueprintPure)

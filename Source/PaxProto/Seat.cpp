@@ -2,6 +2,7 @@
 
 #include "Seat.h"
 #include "Components/BoxComponent.h"
+#include "Components/PointLightComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Containers/UnrealString.h"
 #include "Pax.h"
@@ -27,8 +28,13 @@ ASeat::ASeat()
 	CollisionBox->SetBoxExtent(FVector(22.0f, 30.0f, 40.0f));
 	CollisionBox->SetCollisionProfileName("UI");
 
-	
-
+	//Configure Indicator Light
+	IndicatorLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Indicator Light"));
+	IndicatorLight->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	IndicatorLight->SetIntensity(100.0f);
+	IndicatorLight->SetAttenuationRadius(5.0f);
+	IndicatorLight->SetRelativeLocation(FVector(0.0f, -22.0f, 31.0f));
+	IndicatorLight->SetCastShadows(false);
 
 }
 
@@ -66,6 +72,7 @@ FString ASeat::GetSeatID()
 void ASeat::SetOccupied(bool x)
 {
 	isOccupied = x;
+	(isOccupied) ? IndicatorLight->SetVisibility(false) : IndicatorLight->SetVisibility(true);
 }
 
 bool ASeat::GetOccupied()

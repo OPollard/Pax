@@ -56,8 +56,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SetInfluence(const TArray<AActor*>& NearbyActors, bool foundActors);
-
-	
+		
 	// Utility TICK Functions //////////////////////
 
 	void TargetAcquiring();
@@ -70,8 +69,8 @@ private:
 
 	//Locations and offset targets (to avoid Pax targeting middle of a mesh)
 	FVector DeployLocation;
-	FVector SeatDeployLocationOffset;// = FVector(0.0f, 20.0f, 0.0f);
-	FVector ToiletDeployLocationOffset;// = FVector(100.0f, 0.0f, 0.0f);
+	FVector SeatDeployLocationOffset;
+	FVector ToiletDeployLocationOffset;
 
 	//Cached orientation
 	FTransform PreMoveTransform;

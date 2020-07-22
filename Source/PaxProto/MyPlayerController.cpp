@@ -73,7 +73,11 @@ void AMyPlayerController::SetClicked()
 
 	SearchForActorAtCursor(PAX);
 	
-	if (PaxHandle) { PaxHandle->Clicked(); }
+	if (PaxHandle)
+	{
+		PaxHandle->Clicked();
+	}
+
 }
 
 //Called when bind action left mouse button is released

@@ -8,6 +8,7 @@
 
 
 class UBoxComponent;
+class UPointLightComponent;
 
 UCLASS()
 class PAXPROTO_API ASeat : public AActor
@@ -39,6 +40,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Seat")
 	UBoxComponent* CollisionBox = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Seat")
+	UPointLightComponent* IndicatorLight = nullptr;
 
 	bool isOccupied{ false };
 	bool isUIEnabled{ false };

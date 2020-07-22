@@ -156,9 +156,16 @@ float UPaxState::GetNutrition()
 
 int32 UPaxState::GetNutritionIndicator()
 {
-	if (NutritionChx > 0.0f) return SMALLINCREASE;
+	if (NutritionChx < -0.5f) return LARGEDECREASE;
 	else if (NutritionChx < 0.0f) return SMALLDECREASE;
-	else { return NOCHANGE; }
+	else if (NutritionChx > 0.5f) return LARGEINCREASE;
+	else if (NutritionChx > 0.0f) return SMALLINCREASE;
+	else return NOCHANGE;
+}
+
+void UPaxState::SetExcrement(float value)
+{
+	Excrement = value;
 }
 
 float UPaxState::GetExcrement()
@@ -167,9 +174,11 @@ float UPaxState::GetExcrement()
 }
 int32 UPaxState::GetExcrementIndicator()
 {
-	if (ExcrementChx > 0.0f) return SMALLINCREASE;
+	if (ExcrementChx < -0.5f) return LARGEDECREASE;
 	else if (ExcrementChx < 0.0f) return SMALLDECREASE;
-	else { return NOCHANGE; }
+	else if (ExcrementChx > 0.5f) return LARGEINCREASE;
+	else if (ExcrementChx > 0.0f) return SMALLINCREASE;
+	else return NOCHANGE;
 }
 
 
@@ -179,9 +188,11 @@ float UPaxState::GetSocietal()
 }
 int32 UPaxState::GetSocialIndicator()
 {
-	if (SocialBias > 0.0f) return SMALLINCREASE;
+	if (SocialBias < -0.25f) return LARGEDECREASE;
 	else if (SocialBias < 0.0f) return SMALLDECREASE;
-	else { return NOCHANGE; }
+	else if (SocialBias > 0.25f) return LARGEINCREASE;
+	else if (SocialBias > 0.0f) return SMALLINCREASE;
+	else return NOCHANGE;
 }
 
 
@@ -196,9 +207,11 @@ float UPaxState::GetEnergy()
 }
 int32 UPaxState::GetEnergyIndicator()
 {
-	if (EnergyChx > 0.0f) return SMALLINCREASE;
+	if (EnergyChx < -0.5f) return LARGEDECREASE;
 	else if (EnergyChx < 0.0f) return SMALLDECREASE;
-	else { return NOCHANGE; }
+	else if (EnergyChx > 0.5f) return LARGEINCREASE;
+	else if (EnergyChx > 0.0f) return SMALLINCREASE;
+	else return NOCHANGE;
 }
 
 

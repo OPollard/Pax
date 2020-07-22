@@ -33,6 +33,10 @@ void APax::BeginPlay()
 	//Targets walk location to current spawned spot
 	DeployLocation = this->GetActorLocation();
 
+	//Calibrate Offsets
+	SeatDeployLocationOffset = FVector(0.0f, 40.0f, 0.0f);
+	ToiletDeployLocationOffset = FVector(100.0f, 0.0f, 0.0f);
+
 	//Change walk speed to age group buff/nerf
 	AdaptSpeeds();
 
@@ -63,30 +67,20 @@ void APax::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 //called from playercontroller
 void APax::Clicked()
 {
-	SetPreMoveLocation(this->GetActorTransform());
-	State->ResetStates();
-	State->SetFloating(true);
-	
+		SetPreMoveLocation(this->GetActorTransform());
+		State->ResetStates();
+		State->SetFloating(true);
 }
 void APax::Released()
 {
-	State->SetFloating(false);
-	SetActorTransform(this->GetPreMoveLocation());
+		State->SetFloating(false);
+		SetActorTransform(this->GetPreMoveLocation());
 }
 
 //Commanded go to location
 void APax::SetDeployLocation(FVector Location)
 {
-
-	if (TargetSeat)
-	{
-		DeployLocation = Location + SeatDeployLocationOffset;
-	}
-	else
-	{
-		DeployLocation = Location + ToiletDeployLocationOffset;
-	}
-	
+	DeployLocation = Location;	
 }
 FVector APax::GetDeployLocation()
 {
@@ -123,39 +117,71 @@ void APax::UpdateState()
 //Checks what the target is, eg toilet, seat
 void APax::ManageTarget(AActor* Target)
 {	
-	//Set Casts
-	TargetSeat = Cast<ASeat>(Target);
-	Toilet = Cast<AToilet>(Target);
 
-	//if target is seat
-	if (TargetSeat)
-	{
-		//empty seat
-		if(!TargetSeat->GetOccupied())
+		//Set Casts
+		TargetSeat = Cast<ASeat>(Target);
+		Toilet = Cast<AToilet>(Target);
+
+		//if target is seat
+		if (TargetSeat && State->IsAlive())
 		{
-			//do additional checks to avoid it occupying a seat but never making it due to path
-
-			//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
-			if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
+			//empty seat
+			if (!TargetSeat->GetOccupied())
 			{
-				if (CurrentSeat)
+				//do additional checks to avoid it occupying a seat but never making it due to path
+
+				//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
+				if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
 				{
-					this->SetActorLocation(this->GetActorLocation() + FVector(0.0f, 40.0f, 0.0f));
+					if (CurrentSeat)
+					{
+						this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
+					}
+					if (Toilet)
+					{
+						this->SetActorLocation(this->GetActorLocation() + ToiletDeployLocationOffset);
+					}
 				}
+
+				SetDeployLocation(TargetSeat->GetActorLocation());
+
+				//Cabin Manager needs to know about the new pax ONBOARD
+				if (!State->GetOnboard())
+				{
+					Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
+					if (Manager) Manager->RegisterNewPax(this);
+					if (State) State->SetOnboard(true);
+				}
+
 			}
-
-			SetDeployLocation(TargetSeat->GetActorLocation());
-
-			//Cabin Manager needs to know about the new pax ONBOARD
-			if (!State->GetOnboard())
-			{
-				Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
-				if (Manager) Manager->RegisterNewPax(this);
-				if (State) State->SetOnboard(true);
-			}
-
 		}
-	}
+
+		//if target is a toilet
+		if (Toilet && State->IsAlive())
+		{
+	
+			//empty toilet
+			if (!Toilet->GetOccupied())
+			{
+				//do additional checks to avoid it occupying a seat but never making it due to path
+
+				//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
+				if (FVector::Dist(Toilet->GetActorLocation(), this->GetActorLocation()) > 60.0f)
+				{
+					if (CurrentSeat)
+					{
+						this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
+					}
+				}
+
+				SetDeployLocation(Toilet->GetActorLocation() + ToiletDeployLocationOffset);
+
+				//Cabin manager will need to know whos in the toilet
+
+			}
+			
+		}
+	
 	
 }
 
@@ -236,6 +262,7 @@ void APax::TargetAcquiring()
 	//If we have a target seat
 	if (TargetSeat && (GetDeployLocation() == TargetSeat->GetActorLocation()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Target Seat"));
 			//are we close to it?
 			if ((this->GetDistanceTo(TargetSeat) < 50.0f))
 			{
@@ -252,6 +279,7 @@ void APax::TargetAcquiring()
 
 				//this new seat is now our current, will reroute this function on next tick
 				CurrentSeat = TargetSeat;
+				TargetSeat = nullptr; //DANGER DANGER
 			}
 			else
 			{
@@ -263,9 +291,43 @@ void APax::TargetAcquiring()
 			}
 
 	}
-
-	else if (CurrentSeat)
+	
+	//If we have a target and its a toilet
+	else if (Toilet && (GetDeployLocation() == (Toilet->GetActorLocation() + ToiletDeployLocationOffset))) //TODO
 	{
+		//DEBUG
+		UE_LOG(LogTemp, Warning, TEXT("Toilet"));
+		//are we close to the door
+		if ((FMath::Abs(this->GetActorLocation().X - Toilet->GetActorLocation().X) < 110.0f)
+			&& (FMath::Abs(this->GetActorLocation().Y - Toilet->GetActorLocation().Y) < 20.0f))
+		{
+			//IMPORTANT GAMEPLAY STATES
+			State->SetMoving(false);
+			Toilet->SetOccupied(true);
+			State->SetExcrement(0.0f);
+			this->SetActorHiddenInGame(true);
+			
+
+			//snap actor to middle of toilet
+			this->SetActorLocation(Toilet->GetActorLocation());
+			//rotate to front of seat/level/aircraft
+			this->SetActorRotation(FRotator(0, -90, 0));
+
+			//Clear other targets
+			if (TargetSeat) TargetSeat = nullptr; //DANGER DANGER
+			if (CurrentSeat) CurrentSeat = nullptr; // DANGER DANGER
+		}
+		else
+		{
+			Toilet->SetOccupied(false);
+			this->SetActorHiddenInGame(false);
+			
+		}
+	}
+	//If we have a current seat and no other deploy location
+	else if (CurrentSeat && (GetDeployLocation() == CurrentSeat->GetActorLocation()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Current Seat"));
 		if ((this->GetDistanceTo(CurrentSeat) < 50.0f))
 		{	
 			State->SetMoving(false); // maybe set moving
@@ -287,19 +349,7 @@ void APax::TargetAcquiring()
 		}
 	}
 
-	//If we have a target and its a toilet
-	else if (Toilet && (GetDeployLocation() == Toilet->GetActorLocation())) //TODO
-	{
-		//are we close to the door
-		if (((this->GetActorLocation().X - DeployLocation.X) < 35.0f)
-			&& ((this->GetActorLocation().Y - DeployLocation.Y) < 35.0f))
-		{
-			//snap actor to middle of seat
-			this->SetActorLocation(Toilet->GetActorLocation());
-			//rotate to front of seat/level/aircraft
-			this->SetActorRotation(FRotator(0, -90, 0));
-		}
-	}
+	
 	else
 	{
 		return;

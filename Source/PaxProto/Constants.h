@@ -12,7 +12,7 @@
 //Pax State
 #define NUTRITION_CHX_AVG -0.2f // 2.0f
 #define ENERGY_CHX_AVG -0.5f
-#define EXCREMENT_CHX_AVG 0.25f
+#define EXCREMENT_CHX_AVG 3.0f // 0.25f
 #define SOCIAL_CHX_AVG 0.0f
 
 #define START_MONEY_POOR 1250.0f

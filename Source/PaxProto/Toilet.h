@@ -7,6 +7,7 @@
 #include "Toilet.generated.h"
 
 class UBoxComponent;
+class URectLightComponent;
 
 UCLASS()
 class PAXPROTO_API AToilet : public AActor
@@ -25,7 +26,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, Category = "Seat")
+	UPROPERTY(EditAnywhere, Category = "Toilet")
 		UBoxComponent* CollisionBox = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Toilet")
+		URectLightComponent* IndicatorLight = nullptr;
+
+	void SetOccupied(bool x);
+	bool GetOccupied();
+
+private:
+	
+	bool isOccupied;
 
 };
