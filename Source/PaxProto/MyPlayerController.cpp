@@ -20,6 +20,8 @@ AMyPlayerController::AMyPlayerController()
 	bShowMouseCursor = true;
 	bEnableClickEvents = true;
 	bEnableMouseOverEvents = true;
+	bEnableTouchEvents = true;
+	bEnableTouchOverEvents = true;
 
 }
 
@@ -61,7 +63,6 @@ void AMyPlayerController::Tick(float DeltaTime)
 	else
 	{
 		CheckAndRefreshPaxUI();
-		
 	}
 
 }
@@ -100,16 +101,16 @@ void AMyPlayerController::SearchForActorAtCursor(ECollisionChannel Trace)
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	APlayerCameraManager* PCAM = PC->PlayerCameraManager;
 
-	//Declare outparameters
+	//Declare out parameters
 	FVector WorldLocation;
 	FVector WorldDirection;
-	FVector StartLocation = PCAM->GetCameraLocation();
+	const FVector StartLocation = PCAM->GetCameraLocation();
 	FHitResult HitResult;
 
 	//Convert mouse to world xyz
 	PC->DeprojectMousePositionToWorld(WorldLocation, WorldDirection);
 
-	FVector EndLocation = StartLocation + (WorldDirection * LineTraceRange);
+	const FVector EndLocation = StartLocation + (WorldDirection * LineTraceRange);
 
 	//always check for nulls
 	if (PC && PCAM)
@@ -129,16 +130,16 @@ void AMyPlayerController::SearchForActorAtCursor(ECollisionChannel Trace)
 }
 
 //Returns position for floating objects, will offset for camera angle
-FVector AMyPlayerController::GetCursorHooverPosition()
+FVector AMyPlayerController::GetCursorHooverPosition()const
 {
 	//Get pointers
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	APlayerCameraManager* PCAM = PC->PlayerCameraManager;
 
-	//Declare outparameters
+	//Declare out parameters
 	FVector WorldLocation;
 	FVector WorldDirection;
-	FVector StartLocation = PCAM->GetCameraLocation();
+	const FVector StartLocation = PCAM->GetCameraLocation();
 
 	//Convert mouse position to world xyz
 	PC->DeprojectMousePositionToWorld(WorldLocation, WorldDirection);
@@ -156,7 +157,7 @@ void AMyPlayerController::CheckAndRefreshPaxUI()
 }
 
 //Send trigger to target actor, eg a seat to activate UI overhead
-void AMyPlayerController::SendTriggerToTarget()
+void AMyPlayerController::SendTriggerToTarget() const
 {
 	//confirm target is not null
 	if (Target)
@@ -167,6 +168,4 @@ void AMyPlayerController::SendTriggerToTarget()
 			Seat->SetUIEnabled(true);
 		}
 	}
-
-	
 }

@@ -12,8 +12,15 @@ class AToilet;
 class UPaxState;
 class ACabinManager;
 
+//Pax desired location
+UENUM()
+enum ETarget
+{
+	SELF, TARGETSEAT, CURRENTSEAT, TOILET, NUMOFTARGETS
+};
+
 UCLASS()
-class PAXPROTO_API APax : public ACharacter
+class PAXPROTO_API APax final : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -38,34 +45,43 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetDeployLocation(FVector Location);
 	UFUNCTION(BlueprintCallable)
-	FVector GetDeployLocation();
+	FVector GetDeployLocation() const;
 
 	void SetPreMoveLocation(FTransform PaxOrientation);
-	FTransform GetPreMoveLocation();
+	FTransform GetPreMoveLocation()const;
 
-	void SetViewStatInfo(bool x);
+	void SetViewStatInfo(bool X);
 	UFUNCTION(BlueprintCallable)
-	bool GetViewStatInfo();
+	bool GetViewStatInfo()const;
 
-	void UpdateState();
+	void UpdateState()const;
 
 	// Utility Functions	/////////////////////////////
 
 	void ManageTarget(AActor* Target);
-	void AdaptSpeeds();
+	void ManageTargetPost();
+	void AdaptSpeeds()const;
 
 	UFUNCTION(BlueprintCallable)
-		void SetInfluence(const TArray<AActor*>& NearbyActors, bool foundActors);
+	void SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors)const;
+	UFUNCTION(BlueprintCallable)
+		ETarget GetTargetPlace()const;
 		
 	// Utility TICK Functions //////////////////////
 
 	void TargetAcquiring();
-	void CheckIsMoving();
+	void SelfAcquiring();
+	void TargetSeatAcquiring();
+	void CurrentSeatAcquiring();
+	void ToiletAcquiring()const;
+	void CheckIsMoving()const;
 
+	
 private:
 	
 	//Variables
 	bool EnableStatInfo;
+	ETarget TargetPlace;
 
 	//Locations and offset targets (to avoid Pax targeting middle of a mesh)
 	FVector DeployLocation;
@@ -79,9 +95,10 @@ private:
 	ASeat* TargetSeat = nullptr;
 	ASeat* CurrentSeat = nullptr;
 	AToilet* Toilet = nullptr;
+	AToilet* CurrentToilet = nullptr;
 	UPaxState* State = nullptr;
 	ACabinManager* Manager = nullptr;
 
+	//Timers
 	FTimerHandle PaxTimerHandle;
-
 };

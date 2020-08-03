@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright of Night Owls 2020 - inclusive ©
 
 #pragma once
 
@@ -6,12 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "PaxProtoGameModeBase.generated.h"
 
-/**
- * 
- */
-
 UCLASS()
-class PAXPROTO_API APaxProtoGameModeBase : public AGameModeBase
+class PAXPROTO_API APaxProtoGameModeBase final : public AGameModeBase
 {
 	GENERATED_BODY()
 

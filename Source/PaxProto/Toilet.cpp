@@ -20,7 +20,7 @@ AToilet::AToilet()
 	//Configure Toilet Box
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Click Box"));
 	CollisionBox->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	CollisionBox->SetBoxExtent(FVector(75.0f, 32.0f, 70.0f));
+	CollisionBox->SetBoxExtent(FVector(55.0f, 25.0f, 70.0f));
 	CollisionBox->SetCollisionProfileName("UI");
 
 	//Configure Indicator Light
@@ -34,7 +34,8 @@ AToilet::AToilet()
 	IndicatorLight->SetBarnDoorLength(5.0f);
 	IndicatorLight->SetCastShadows(false);
 
-	isOccupied = false;
+	FrontToiletOccupied = false;
+	RearToiletOccupied = false;
 }
 
 // Called when the game starts or when spawned
@@ -52,16 +53,49 @@ void AToilet::Tick(float DeltaTime)
 }
 
 //Set occupancy status
-void AToilet::SetOccupied(bool x)
+void AToilet::SetOccupied(const bool X)
 {
-	isOccupied = x;
-	IndicatorLight->SetIntensity(((x)? 1500.0f : 100.0f));
+	//Get world name
+	const FString ID = this->GetName();
+	//Check if its forward or rear door
+	if (ID.Contains("d"))
+	{
+		//Set it accordingly
+		FrontToiletOccupied = X;
+	}
+	else
+	{
+		RearToiletOccupied = X;
+	}
+	//Increase light brightness to signal that its occupied
+	IndicatorLight->SetIntensity(((X) ? 500.0f : 100.0f));
 }
 
 //Get occupancy status
-bool AToilet::GetOccupied()
+bool AToilet::GetOccupied()const
 {
-	return isOccupied;
+	//Get world name
+	const FString ID = this->GetName();
+	//Return according door
+	if (ID.Contains("d"))
+	{
+		return FrontToiletOccupied;
+	}
+	else
+	{
+		return RearToiletOccupied;
+	}
 }
 
 
+//Set Occupier Actor
+void AToilet::SetOccupier(AActor* Pax)
+{
+	Occupier = Pax;
+}
+
+//Get Occupier Actor
+AActor* AToilet::GetOccupier() const
+{
+	return Occupier;
+}

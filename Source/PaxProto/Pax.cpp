@@ -1,19 +1,15 @@
 // Copyright of Night Owls 2020 - inclusive ©
 
 #include "Pax.h"
-#include "Engine/World.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "Seat.h"
 #include "Toilet.h"
 #include "PaxState.h"
 #include "Constants.h"
-#include "Door.h"
 #include "CabinManager.h"
 
 // Sets default values
@@ -35,9 +31,9 @@ void APax::BeginPlay()
 
 	//Calibrate Offsets
 	SeatDeployLocationOffset = FVector(0.0f, 40.0f, 0.0f);
-	ToiletDeployLocationOffset = FVector(100.0f, 0.0f, 0.0f);
+	ToiletDeployLocationOffset = FVector(120.0f, 0.0f, 0.0f);
 
-	//Change walk speed to age group buff/nerf
+	//Change walk/rotation speed to age group buff/nerf
 	AdaptSpeeds();
 
 	//Timer on repeat to enable attributes to change with time
@@ -55,6 +51,7 @@ void APax::Tick(float DeltaTime)
 
 	//Controls deployment target, corrects snapping and enables/disables seat hopping
 	TargetAcquiring();
+
 }
 
 // Called to bind functionality to input
@@ -64,7 +61,7 @@ void APax::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 
-//called from playercontroller
+//called from player controller
 void APax::Clicked()
 {
 		SetPreMoveLocation(this->GetActorTransform());
@@ -78,38 +75,38 @@ void APax::Released()
 }
 
 //Commanded go to location
-void APax::SetDeployLocation(FVector Location)
+void APax::SetDeployLocation(const FVector Location)
 {
 	DeployLocation = Location;	
 }
-FVector APax::GetDeployLocation()
+FVector APax::GetDeployLocation() const
 {
 	return DeployLocation;
 }
 
 //Cached/Stored location before going to deploy location
-void APax::SetPreMoveLocation(FTransform PaxOrientation)
+void APax::SetPreMoveLocation(const FTransform PaxOrientation)
 {
 	PreMoveTransform = PaxOrientation;
 }
-FTransform APax::GetPreMoveLocation()
+FTransform APax::GetPreMoveLocation()const
 {
 	return PreMoveTransform;
 }
 
 //Enable Pax Info Stat UI
-void APax::SetViewStatInfo(bool x)
+void APax::SetViewStatInfo(const bool X)
 {
-	EnableStatInfo = x;
+	EnableStatInfo = X;
 }
-bool APax::GetViewStatInfo()
+bool APax::GetViewStatInfo()const
 {
 	return EnableStatInfo;
 }
 
 
 //Redirects function to state so it updates, called repeatable from timer in begin play
-void APax::UpdateState()
+void APax::UpdateState()const
 {
 	State->UpdateCores();
 }
@@ -133,26 +130,18 @@ void APax::ManageTarget(AActor* Target)
 				//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
 				if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
 				{
-					if (CurrentSeat)
+					//gets off chair to go to target
+					if (TargetPlace == ETarget::CURRENTSEAT)
 					{
 						this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
 					}
-					if (Toilet)
+					//gets out toilet to go to target
+					if (TargetPlace == ETarget::TOILET)
 					{
-						this->SetActorLocation(this->GetActorLocation() + ToiletDeployLocationOffset);
+						//set offset in blueprint toilet_bp when wanting to leave
 					}
 				}
-
-				SetDeployLocation(TargetSeat->GetActorLocation());
-
-				//Cabin Manager needs to know about the new pax ONBOARD
-				if (!State->GetOnboard())
-				{
-					Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
-					if (Manager) Manager->RegisterNewPax(this);
-					if (State) State->SetOnboard(true);
-				}
-
+				ManageTargetPost();
 			}
 		}
 
@@ -173,20 +162,55 @@ void APax::ManageTarget(AActor* Target)
 						this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
 					}
 				}
-
-				SetDeployLocation(Toilet->GetActorLocation() + ToiletDeployLocationOffset);
-
-				//Cabin manager will need to know whos in the toilet
-
+				ManageTargetPost();
 			}
-			
 		}
 	
 	
 }
+//Dirty post delay activations, after pax thinking time from seat
+void APax::ManageTargetPost()
+{
+	if (TargetSeat)
+	{
+		//Set deploy location and target so we can make this a nullptr
+		SetDeployLocation(TargetSeat->GetActorLocation());
+		//Remove Occupancy of previous seat
+		if (CurrentSeat) CurrentSeat->SetOccupied(false);
+		//Important for correct path, turned to false when sat down
+		this->SetCanAffectNavigationGeneration(true);
+		//Redirect path for tick
+		TargetPlace = ETarget::TARGETSEAT;
+		
+
+		//Cabin Manager needs to know about the new pax OnBoard
+		if (!State->GetOnboard())
+		{
+			//Get the cabin manager
+			Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
+			if (Manager) Manager->RegisterNewPax(this);
+			if (State) State->SetOnboard(true);
+		}
+	}
+	else if (Toilet)
+	{
+		//Set deploy location and target so we can make this a nullptr
+		SetDeployLocation(Toilet->GetActorLocation() + ToiletDeployLocationOffset);
+		//	Toilet->SetOccupied(false);
+		//Remove Occupancy of previous seat
+		if (CurrentSeat) CurrentSeat->SetOccupied(false);
+		TargetPlace = ETarget::TOILET;
+
+		//Cabin manager will need to know who is in the toilet TODO
+	}
+	else
+	{
+		return;
+	}
+}
 
 //Changes Pax walk speed depending on age
-void APax::AdaptSpeeds()
+void APax::AdaptSpeeds()const
 {
 	UCharacterMovementComponent* Pax_Movement = GetCharacterMovement();
 
@@ -202,18 +226,20 @@ void APax::AdaptSpeeds()
 	{ 
 		Pax_Movement->MaxWalkSpeed = ADULT_WALK_SPEED; 
 	}
-
+	//set anim play speed for legs
 	State->SetAnimPlaySpeed(Pax_Movement->MaxWalkSpeed);
+	//set rotation rate to give lethargic style
+	Pax_Movement->RotationRate.Yaw = (Pax_Movement->MaxWalkSpeed / ADULT_WALK_SPEED) * STANDARD_ROTATION_SPEED;
 }
 
 // PER TICK :Receives overlap actors, calculates social bias
-void APax::SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors)
+void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActors)const
 {
 	if (FoundActors)
 	{
 		float GroupBias{ 0 };
-		//Get length for to iterate for loop
-		int NumOfActors = NearbyActors.Num();
+		//Get length to iterate for loop
+		const int NumOfActors = NearbyActors.Num();
 		for (int i{ 0 }; i < NumOfActors; ++i)
 		{
 			float Bias{ 0 };
@@ -255,110 +281,79 @@ void APax::SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors)
 	}
 }
 
-//NEEDS FINE TUNING :<(
 //called every tick, senses seat occupancy,distance,snapping
 void APax::TargetAcquiring()
 {
-	//If we have a target seat
-	if (TargetSeat && (GetDeployLocation() == TargetSeat->GetActorLocation()))
+	//Redirect Scripts to appropriate action
+	switch (TargetPlace)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Target Seat"));
-			//are we close to it?
-			if ((this->GetDistanceTo(TargetSeat) < 50.0f))
-			{
-				State->SetMoving(false);
-				State->SetSitting(true);
-
-				//2 new lines
-				TargetSeat->SetOccupied(true);
-				this->SetCanAffectNavigationGeneration(false);
-
-				//snap to seat
-				this->SetActorLocation(TargetSeat->GetActorLocation());
-				this->SetActorRotation(FRotator(0, -90, 0));
-
-				//this new seat is now our current, will reroute this function on next tick
-				CurrentSeat = TargetSeat;
-				TargetSeat = nullptr; //DANGER DANGER
-			}
-			else
-			{
-				State->SetSitting(false);
-
-				//2 new lines
-				TargetSeat->SetOccupied(false);
-				this->SetCanAffectNavigationGeneration(true);
-			}
-
+		case SELF:
+			SelfAcquiring();
+			 break;
+		case TARGETSEAT:
+			TargetSeatAcquiring();
+			 break;
+		case CURRENTSEAT:
+			CurrentSeatAcquiring();
+		case TOILET:
+			ToiletAcquiring();
+			 break;
+		default:
+			 break;
 	}
-	
-	//If we have a target and its a toilet
-	else if (Toilet && (GetDeployLocation() == (Toilet->GetActorLocation() + ToiletDeployLocationOffset))) //TODO
+}
+
+//Lock onto current location ignore ReSharper Static
+void APax::SelfAcquiring()
+{
+	//blank at the moment
+}
+//Lock onto seat target DO NOT TOUCH WITHOUT READING THOROUGHLY FIRST
+void APax::TargetSeatAcquiring()
+{
+	if ((this->GetDistanceTo(TargetSeat) < SEAT_SNAP_RANGE)) //snap when close, ran once
 	{
-		//DEBUG
-		UE_LOG(LogTemp, Warning, TEXT("Toilet"));
-		//are we close to the door
-		if ((FMath::Abs(this->GetActorLocation().X - Toilet->GetActorLocation().X) < 110.0f)
-			&& (FMath::Abs(this->GetActorLocation().Y - Toilet->GetActorLocation().Y) < 20.0f))
-		{
-			//IMPORTANT GAMEPLAY STATES
-			State->SetMoving(false);
-			Toilet->SetOccupied(true);
-			State->SetExcrement(0.0f);
-			this->SetActorHiddenInGame(true);
-			
-
-			//snap actor to middle of toilet
-			this->SetActorLocation(Toilet->GetActorLocation());
-			//rotate to front of seat/level/aircraft
-			this->SetActorRotation(FRotator(0, -90, 0));
-
-			//Clear other targets
-			if (TargetSeat) TargetSeat = nullptr; //DANGER DANGER
-			if (CurrentSeat) CurrentSeat = nullptr; // DANGER DANGER
-		}
-		else
-		{
-			Toilet->SetOccupied(false);
-			this->SetActorHiddenInGame(false);
-			
-		}
+		TargetSeat->SetOccupied(true);						 
+		State->SetMoving(false);							 
+		State->SetSitting(true);							 
+		this->SetActorLocation(TargetSeat->GetActorLocation());
+		this->SetActorRotation(FRotator(0, -90, 0));
+		this->SetCanAffectNavigationGeneration(false); //set true in manage target
+		CurrentSeat = TargetSeat;
+		TargetSeat = nullptr; //danger
+		TargetPlace = ETarget::CURRENTSEAT; //redirect for next tick
 	}
-	//If we have a current seat and no other deploy location
-	else if (CurrentSeat && (GetDeployLocation() == CurrentSeat->GetActorLocation()))
+}
+
+//Lock onto current seat
+void APax::CurrentSeatAcquiring()
+{
+	if (!State->GetFloating()) //ran all the time while not floating and sat down
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Current Seat"));
-		if ((this->GetDistanceTo(CurrentSeat) < 50.0f))
-		{	
-			State->SetMoving(false); // maybe set moving
-			State->SetSitting(true);
-
-			//occupancy
-			CurrentSeat->SetOccupied(true);
-
-			//snap to seat
-			this->SetActorLocation(CurrentSeat->GetActorLocation());
-			this->SetActorRotation(FRotator(0, -90, 0));
-		}
-		else
-		{
-			State->SetSitting(false);
-
-			//occupancy
-			CurrentSeat->SetOccupied(false);
-		}
+		this->SetActorLocation(CurrentSeat->GetActorLocation());
+		this->SetActorRotation(FRotator(0, -90, 0));
+		State->SetMoving(false); //for animations
+		State->SetSitting(true);
 	}
-
-	
-	else
+}
+//Lock onto toilet target
+void APax::ToiletAcquiring()const
+{
+	if (Toilet && Toilet->GetOccupied())
 	{
-		return;
+		State->SetExcrement(0.0f);
 	}
 }
 
 //Checks if Pax is moving
-void APax::CheckIsMoving()
+void APax::CheckIsMoving()const
 {
 	State->SetMoving((this->GetVelocity().IsZero()) ? false : true);
+	if(State->GetMoving())State->SetSitting(false);
 }
 
+//Return target place
+ETarget APax::GetTargetPlace()const
+{
+	return TargetPlace;
+}

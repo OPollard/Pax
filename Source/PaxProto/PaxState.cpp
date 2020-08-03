@@ -34,17 +34,18 @@ void UPaxState::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 //Calibrate Stats on startup, called from Pax
 void UPaxState::Initialise()
 {
-
+	//Randomise Name and Age on Spawn
 	Name = Names[FMath::RandRange(0, (Names.Num()-1))];
 	Age = FMath::RandRange(1, 80);
-
+	//Randomise Wealth and Politeness on Spawn
 	Politeness = static_cast<EPoliteness>(FMath::RandRange(0, EPoliteness::NUMOFPOLITENESS-1));
 	Wealthiness = static_cast<EWealth>(FMath::RandRange(0, EWealth::NUMOFWEALTH-1));
-
+	//Set Enum Depending on Age Result
 	if (Age >= 0 && Age < 12) { AgeGroup = EGeneration::YOUNG; }
 	if (Age >= 12 && Age < 65) { AgeGroup = EGeneration::ADULT; }
 	if (Age >= 65 && Age < 81) { AgeGroup = EGeneration::OLD; }
 
+	//Allocate an amount of potential money from the pax depending on wealthiness
 	switch (Wealthiness)
 	{
 	case POOR: Money = START_MONEY_POOR; break;
@@ -92,9 +93,10 @@ void UPaxState::UpdateCores()
 		//if DeltaSum is below spawn threshold
 		if (DeltaSum < MoneyDropLimit)
 		{
-			//higher stats the better the delta, excrement is best at 0, represents a ratio of maximum best stats and makes that a ratio of maximum earnable per tick
-			Delta = (int)(((Nutrition + Energy + (FMath::Abs(Excrement - 100.0f) + Societal)) / 400) * DrainDatum);
+			//higher stats the better the delta, excrement is best at 0, represents a ratio of maximum best stats and makes that a ratio of maximum earned per tick
+			Delta = static_cast<int>(((Nutrition + Energy + (FMath::Abs(Excrement - 100.0f) + Societal)) / 400) * DrainDatum);
 			DeltaSum += Delta;
+			//If the delta goes over our limit, cap it and prevent further growth
 			if (DeltaSum > MoneyDropLimit) { DeltaSum = MoneyDropLimit; }
 		}
 		else //must be over spawn threshold
@@ -106,55 +108,55 @@ void UPaxState::UpdateCores()
 				AwaitingPickup = (SpawnMoney()) ? true : false;	
 			}
 		}
-		//UE_LOG(LogTemp, Warning, TEXT("Delta: %i"), DeltaSum);
 	}
 	
 }
 
 //spawn money overhead PAX, and await cursor ahead. Functionality in money.cpp
-bool UPaxState::SpawnMoney()
+bool UPaxState::SpawnMoney()const
 {
 	if (MoneyActor)
 	{
-		FVector SpawnLocation = (GetOwner()->GetActorLocation()) + FVector(0, 5, 100);
-		FRotator SpawnRotation = FRotator(45, 0,0);
+		//Get Variables for function below
+		const FVector SpawnLocation = (GetOwner()->GetActorLocation()) + FVector(0, 5, 100);
+		const FRotator SpawnRotation = FRotator(45, 0,0);
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.Owner = GetOwner();
+		//Spawn Money Actor
 		AMoney* SpawnedMoney = GetWorld()->SpawnActor<AMoney>(MoneyActor, SpawnLocation, SpawnRotation, SpawnParameters);
+		//Attach to pax so it moves with them, like tilting on takeoff etc
 		SpawnedMoney->AttachToActor(GetOwner(),FAttachmentTransformRules::KeepWorldTransform);
 		return true;
 	}
 	return false;
 }
 
-//Returns Age of Pax
-int32 UPaxState::GetAge()
+int32 UPaxState::GetAge()const
 {
 	return Age;
 }
 
-//Return Generation
-EGeneration UPaxState::GetAgeGroup()
+EGeneration UPaxState::GetAgeGroup()const
 {
 	return AgeGroup;
 }
 
-EPoliteness UPaxState::GetPoliteness()
+EPoliteness UPaxState::GetPoliteness()const
 {
 	return Politeness;
 }
 
-FString UPaxState::GetName()
+FString UPaxState::GetName()const
 {
 	return Name;
 }
 
-float UPaxState::GetNutrition()
+float UPaxState::GetNutrition()const
 {
 	return Nutrition;
 }
-
-int32 UPaxState::GetNutritionIndicator()
+//Represents in state form, the level of change
+int32 UPaxState::GetNutritionIndicator()const
 {
 	if (NutritionChx < -0.5f) return LARGEDECREASE;
 	else if (NutritionChx < 0.0f) return SMALLDECREASE;
@@ -163,16 +165,17 @@ int32 UPaxState::GetNutritionIndicator()
 	else return NOCHANGE;
 }
 
-void UPaxState::SetExcrement(float value)
+void UPaxState::SetExcrement(const float Value)
 {
-	Excrement = value;
+	Excrement = Value;
 }
 
-float UPaxState::GetExcrement()
+float UPaxState::GetExcrement()const
 {
 	return Excrement;
 }
-int32 UPaxState::GetExcrementIndicator()
+//Represents in state form, the level of change
+int32 UPaxState::GetExcrementIndicator()const
 {
 	if (ExcrementChx < -0.5f) return LARGEDECREASE;
 	else if (ExcrementChx < 0.0f) return SMALLDECREASE;
@@ -180,13 +183,12 @@ int32 UPaxState::GetExcrementIndicator()
 	else if (ExcrementChx > 0.0f) return SMALLINCREASE;
 	else return NOCHANGE;
 }
-
-
-float UPaxState::GetSocietal()
+float UPaxState::GetSocietal()const
 {
 	return Societal;
 }
-int32 UPaxState::GetSocialIndicator()
+//Represents in state form, the level of change
+int32 UPaxState::GetSocialIndicator()const
 {
 	if (SocialBias < -0.25f) return LARGEDECREASE;
 	else if (SocialBias < 0.0f) return SMALLDECREASE;
@@ -196,16 +198,17 @@ int32 UPaxState::GetSocialIndicator()
 }
 
 
-void UPaxState::SetSocialBias(float x)
+void UPaxState::SetSocialBias(const float Value)
 {
-	SocialBias = x;
+	SocialBias = Value;
 }
 
-float UPaxState::GetEnergy()
+float UPaxState::GetEnergy()const
 {
 	return Energy;
 }
-int32 UPaxState::GetEnergyIndicator()
+//Represents in state form, the level of change
+int32 UPaxState::GetEnergyIndicator()const
 {
 	if (EnergyChx < -0.5f) return LARGEDECREASE;
 	else if (EnergyChx < 0.0f) return SMALLDECREASE;
@@ -215,17 +218,17 @@ int32 UPaxState::GetEnergyIndicator()
 }
 
 
-float UPaxState::GetAnimPlaySpeed()
+float UPaxState::GetAnimPlaySpeed()const
 {
 	return AnimationPlaySpeed;
 }
 
 //Set anim walk play speed as a ratio of movement speed
-void UPaxState::SetAnimPlaySpeed(float WalkSpeed)
+void UPaxState::SetAnimPlaySpeed(const float WalkSpeed)
 {
 	AnimationPlaySpeed = WalkSpeed / ADULT_WALK_SPEED;
 }
-
+//Set States to Default of false
 void UPaxState::ResetStates()
 {
 	Sitting = false;
@@ -234,59 +237,59 @@ void UPaxState::ResetStates()
 	InToilet = false;
 }
 
-//Is pax onboard or off
-void UPaxState::SetOnboard(bool x)
+//Is pax OnBoard or off
+void UPaxState::SetOnboard(const bool X)
 {
-	Onboard = x;
+	Onboard = X;
 }
 
-bool UPaxState::GetOnboard()
+bool UPaxState::GetOnboard()const
 {
 	return Onboard;
 }
 
 //Is pax sitting in a seat
-void UPaxState::SetSitting(bool x)
+void UPaxState::SetSitting(const bool X)
 {
-	Sitting = x;
+	Sitting = X;
 }
-bool UPaxState::GetSitting()
+bool UPaxState::GetSitting()const
 {
 	return Sitting;
 }
 
 //Is pax elevated by mouse
-void UPaxState::SetFloating(bool x)
+void UPaxState::SetFloating(const bool X)
 {
-	Floating = x;
+	Floating = X;
 }
-bool UPaxState::GetFloating()
+bool UPaxState::GetFloating()const
 {
 	return Floating;
 }
 
 //Is pax using the loo
-void UPaxState::SetInToilet(bool x)
+void UPaxState::SetInToilet(const bool X)
 {
-	InToilet = x;
+	InToilet = X;
 }
-bool UPaxState::GetInToilet()
+bool UPaxState::GetInToilet() const
 {
 	return InToilet;
 }
 
 //Is pax moving
-void UPaxState::SetMoving(bool x)
+void UPaxState::SetMoving(const bool X)
 {
-	Moving = x;
+	Moving = X;
 }
-bool UPaxState::GetMoving()
+bool UPaxState::GetMoving()const
 {
 	return Moving;
 }
 
 // Returns money stat as FText format for the UI
-FText UPaxState::GetMoneyAsText()
+FText UPaxState::GetMoneyAsText()const
 {
 	FString p_Money{ FString::SanitizeFloat(Money, 0) };
 	FString p_Display{ "$" };
@@ -294,14 +297,14 @@ FText UPaxState::GetMoneyAsText()
 	return UKismetTextLibrary::Conv_StringToText(p_Display);
 }
 
-float UPaxState::GetMoney()
+float UPaxState::GetMoney()const
 {
 	return Money;
 }
 
-void UPaxState::SetMoney(float x)
+void UPaxState::SetMoney(const float X)
 {
-	Money = x;
+	Money = X;
 }
 
 void UPaxState::ResetDeltaSum()
@@ -309,21 +312,21 @@ void UPaxState::ResetDeltaSum()
 	DeltaSum = 0;
 }
 
-int UPaxState::GetDeltaSum()
+int UPaxState::GetDeltaSum()const
 {
 	return DeltaSum;
 }
 
-void UPaxState::SetAwaitingPickUp(bool x)
+void UPaxState::SetAwaitingPickUp(const bool X)
 {
-	AwaitingPickup = x;
+	AwaitingPickup = X;
 }
 
-bool UPaxState::GetAwaitingPickup()
+bool UPaxState::GetAwaitingPickup()const
 {
 	return AwaitingPickup;
 }
-
+//Alive is currently dependant on amount of nutrition, may change or add late
 bool UPaxState::IsAlive()
 {
 	Alive = (Nutrition < 1) ? false : true;

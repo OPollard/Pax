@@ -13,7 +13,7 @@ class APax;
 class UPaxState;
 
 UCLASS(transient, Blueprintable, hideCategories = AnimInstance, BlueprintType)
-class PAXPROTO_API UPax_AnimInstance : public UAnimInstance
+class PAXPROTO_API UPax_AnimInstance final : public UAnimInstance
 {
 	GENERATED_BODY()
 public:

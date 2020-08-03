@@ -3,9 +3,12 @@
 
 //Pax
 #define YOUNG_WALK_SPEED 400.0f
-#define ADULT_WALK_SPEED 250.0f
-#define OLD_WALK_SPEED 100.0f
+#define ADULT_WALK_SPEED 300.0f //250.0f
+#define OLD_WALK_SPEED 200.0f  //100.0f
+#define STANDARD_ROTATION_SPEED 540.0f
 
+//Pax Variables
+#define SEAT_SNAP_RANGE 50.0f
 //Set in Pax_BP
 #define INFLUENCE_RANGE 90.0f
 

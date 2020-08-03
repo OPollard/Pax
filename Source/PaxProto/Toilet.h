@@ -10,7 +10,7 @@ class UBoxComponent;
 class URectLightComponent;
 
 UCLASS()
-class PAXPROTO_API AToilet : public AActor
+class PAXPROTO_API AToilet final : public AActor
 {
 	GENERATED_BODY()
 	
@@ -26,16 +26,23 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, Category = "Toilet")
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = "Toilet")
 		UBoxComponent* CollisionBox = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Toilet")
 		URectLightComponent* IndicatorLight = nullptr;
 
-	void SetOccupied(bool x);
-	bool GetOccupied();
+	UFUNCTION(BlueprintCallable)
+	void SetOccupied(bool X);
+	UFUNCTION(BlueprintCallable)
+	bool GetOccupied()const;
+
+	void SetOccupier(AActor* Pax);
+	AActor* GetOccupier() const;
 
 private:
 	
-	bool isOccupied;
+	bool FrontToiletOccupied;
+	bool RearToiletOccupied;
+	AActor* Occupier = nullptr;
 
 };

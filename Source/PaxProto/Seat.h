@@ -11,7 +11,7 @@ class UBoxComponent;
 class UPointLightComponent;
 
 UCLASS()
-class PAXPROTO_API ASeat : public AActor
+class PAXPROTO_API ASeat final : public AActor
 {
 	GENERATED_BODY()
 	
@@ -22,15 +22,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetUIEnabled(bool x);
+	void SetUIEnabled(bool X);
 	UFUNCTION(BlueprintCallable)
-	bool GetUIEnabled();
-	UFUNCTION(BlueprintPure)
-		FString GetSeatID();
+	bool GetUIEnabled()const;
+	void UITimerExpired();
 
-	void SetOccupied(bool x);
 	UFUNCTION(BlueprintPure)
-	bool GetOccupied();
+	FString GetSeatID()const;
+
+	void SetOccupied(bool X);
+	UFUNCTION(BlueprintPure)
+	bool GetOccupied()const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -38,12 +40,14 @@ protected:
 
 private:
 
+	FTimerHandle UITimer;
+
 	UPROPERTY(EditAnywhere, Category = "Seat")
 	UBoxComponent* CollisionBox = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Seat")
 	UPointLightComponent* IndicatorLight = nullptr;
 
-	bool isOccupied{ false };
-	bool isUIEnabled{ false };
+	bool IsOccupied{ false };
+	bool IsUIEnabled{ false };
 };

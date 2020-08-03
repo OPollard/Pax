@@ -12,7 +12,7 @@
 class APax;
 
 UCLASS()
-class PAXPROTO_API AMyPlayerController : public APlayerController
+class PAXPROTO_API AMyPlayerController final : public APlayerController
 {
 	GENERATED_BODY()
 
@@ -42,9 +42,9 @@ private:
 	
 	//Functions
 	void SearchForActorAtCursor(ECollisionChannel Trace);
-	FVector GetCursorHooverPosition();
+	FVector GetCursorHooverPosition() const;
 	void CheckAndRefreshPaxUI();
-	void SendTriggerToTarget();
+	void SendTriggerToTarget() const;
 	
 
 };

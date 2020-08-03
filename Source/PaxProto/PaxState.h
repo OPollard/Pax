@@ -10,55 +10,29 @@
 //Forward Declarations
 class AMoney;
 
-// Characterises the age group
+//Set the age group
 UENUM()
 enum EGeneration
-{
-	YOUNG,
-	ADULT,
-	OLD,
-
-	NUMOFGENERATIONS
-};
+{	YOUNG, ADULT, OLD, NUMOFGENERATIONS	};
 
 UENUM()
 enum EPoliteness
-{
-	UNSOCIAL,
-	NEUTRAL,
-	SOCIAL,
-
-	NUMOFPOLITENESS
-};
+{	UNSOCIAL, NEUTRAL, SOCIAL,NUMOFPOLITENESS };
 
 UENUM()
 enum EWealth
-{
-	POOR,
-	AVERAGE,
-	WEALTHY,
-	RICH,
-
-	NUMOFWEALTH
-};
+{	POOR, AVERAGE, WEALTHY, RICH, NUMOFWEALTH };
 
 UENUM()
 enum EIndicator
-{
-	LARGEDECREASE = -2,
-	SMALLDECREASE = -1,
-	NOCHANGE = 0,
-	SMALLINCREASE = 1,
-	LARGEINCREASE = 2,
-
-	NUMOFINDICATORS
-};
+{	LARGEDECREASE = -2, SMALLDECREASE = -1, NOCHANGE = 0,
+	SMALLINCREASE = 1, LARGEINCREASE = 2, NUMOFINDICATORS };
 
 //Preprocessor Directive to construct a MACRO DELEGATE where this name is found
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPaxDelegate);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PAXPROTO_API UPaxState : public UActorComponent
+class PAXPROTO_API UPaxState final : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -73,88 +47,89 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	//Delegate to be broadcasted across the game
+	//Delegate to be broadcast across the game
 	FPaxDelegate OnDeath;
 
 	void Initialise();
 
 	void UpdateCores();
 
-	bool SpawnMoney();
+	bool SpawnMoney()const;
 
 	UFUNCTION(BlueprintPure)
-		EGeneration GetAgeGroup();
+		EGeneration GetAgeGroup()const;
 	
 	UFUNCTION(BlueprintPure)
-		EPoliteness GetPoliteness();
+		EPoliteness GetPoliteness()const;
 
 	UFUNCTION(BlueprintPure)
-		int32 GetAge();
+		int32 GetAge()const;
 
 	UFUNCTION(BlueprintPure)
-		FString GetName();
+		FString GetName()const;
 
 	//Change indicator code so that it returns a state of increase or
 	//decrease such as big decrease -2, small decrease -1, neutral 0 etc
 	UFUNCTION(BlueprintPure)
-		float GetNutrition();
+		float GetNutrition()const;
 	UFUNCTION(BlueprintPure)
-		int32 GetNutritionIndicator();
+		int32 GetNutritionIndicator()const;
 
-	void SetExcrement(float value);
+	void SetExcrement(float Value);
 	UFUNCTION(BlueprintPure)
-		float GetExcrement();
+		float GetExcrement()const;
 	UFUNCTION(BlueprintPure)
-		int32 GetExcrementIndicator();
-
-	UFUNCTION(BlueprintPure)
-		float GetSocietal();
-	UFUNCTION(BlueprintPure)
-		int32 GetSocialIndicator();
-	void SetSocialBias(float x);
+		int32 GetExcrementIndicator()const;
 
 	UFUNCTION(BlueprintPure)
-		float GetEnergy();
+		float GetSocietal()const;
 	UFUNCTION(BlueprintPure)
-		int32 GetEnergyIndicator();
+		int32 GetSocialIndicator()const;
+	void SetSocialBias(float Value);
+
+	UFUNCTION(BlueprintPure)
+		float GetEnergy()const;
+	UFUNCTION(BlueprintPure)
+		int32 GetEnergyIndicator() const;
 	
 	
 
 	UFUNCTION(BlueprintPure)
-		float GetAnimPlaySpeed();
+		float GetAnimPlaySpeed()const;
 
 	void SetAnimPlaySpeed(float WalkSpeed);
 
 	// Status Functions	///
 	void ResetStates();
 
-	void SetOnboard(bool x);
-	bool GetOnboard();
+	void SetOnboard(bool X);
+	bool GetOnboard()const;
 
-	void SetSitting(bool x);
-	bool GetSitting();
+	void SetSitting(bool X);
+	bool GetSitting()const;
 
-	void SetFloating(bool x);
-	bool GetFloating();
+	void SetFloating(bool X);
+	UFUNCTION(BlueprintPure)
+	bool GetFloating()const;
 
-	void SetInToilet(bool x);
-	bool GetInToilet();
-
-	void SetMoving(bool x);
+	void SetInToilet(bool X);
+	bool GetInToilet()const;
+	UFUNCTION(BlueprintCallable)
+	void SetMoving(bool X);
 
 	UFUNCTION(BlueprintPure)
-	bool GetMoving();
+	bool GetMoving()const;
 
 	UFUNCTION(BlueprintPure)
-	FText GetMoneyAsText();
-	float GetMoney();
-	void SetMoney(float x);
+	FText GetMoneyAsText()const;
+	float GetMoney()const;
+	void SetMoney(float X);
 
 	void ResetDeltaSum();
-	int GetDeltaSum();
+	int GetDeltaSum()const;
 
-	void SetAwaitingPickUp(bool x);
-	bool GetAwaitingPickup();
+	void SetAwaitingPickUp(bool X);
+	bool GetAwaitingPickup()const;
 
 	bool IsAlive();
 	
@@ -194,9 +169,6 @@ private:
 	int DeltaSum{ 0 };
 	int MoneyDropLimit{ 0 };
 	float DrainDatum{ 0.0f };
-
-	
-	
 	
 	bool AwaitingPickup{ false };
 	bool Alive{ true };

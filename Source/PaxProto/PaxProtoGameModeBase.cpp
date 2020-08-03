@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright of Night Owls 2020 - inclusive ©
 
 #include "PaxProtoGameModeBase.h"
 #include "MyPlayerController.h"
@@ -10,6 +10,7 @@ APaxProtoGameModeBase::APaxProtoGameModeBase()
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
+	//Enables the game to use our own custom player controller
 	PlayerControllerClass = AMyPlayerController::StaticClass();	
 		
 }

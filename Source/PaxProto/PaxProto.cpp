@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright of Night Owls 2020 - inclusive ©
 
 #include "PaxProto.h"
 #include "Modules/ModuleManager.h"

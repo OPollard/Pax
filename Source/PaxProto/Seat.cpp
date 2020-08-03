@@ -1,12 +1,11 @@
 // Copyright of Night Owls 2020 - inclusive ©
 
 #include "Seat.h"
+#include "TimerManager.h"
 #include "Components/BoxComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Containers/UnrealString.h"
-#include "Pax.h"
-#include "PaxState.h"
 
 
 // Sets default values
@@ -14,7 +13,8 @@ ASeat::ASeat()
 {
  	//Turned off tick due to many seats
 	PrimaryActorTick.bCanEverTick = false;
-	
+	PrimaryActorTick.bStartWithTickEnabled = false;
+	this->SetActorTickEnabled(false);
 
 	//Guard against having no root
 	if (!RootComponent)
@@ -25,8 +25,7 @@ ASeat::ASeat()
 	//Configure Seat Box
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Click Box"));
 	CollisionBox->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	CollisionBox->SetBoxExtent(FVector(22.0f, 30.0f, 40.0f));
-	CollisionBox->SetCollisionProfileName("UI");
+	CollisionBox->SetBoxExtent(FVector(22.0f, 30.0f, 40.0f));	
 
 	//Configure Indicator Light
 	IndicatorLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Indicator Light"));
@@ -41,41 +40,62 @@ ASeat::ASeat()
 // Called when the game starts or when spawned
 void ASeat::BeginPlay()
 {
-	Super::BeginPlay();	
-
+	Super::BeginPlay();
+	IsUIEnabled = false;
 }
 
 // Called every frame
 void ASeat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	isUIEnabled = false;
-
+	UE_LOG(LogTemp, Warning, TEXT("Ticking"));
 }
 
-void ASeat::SetUIEnabled(bool x)
+//Called from player controller
+void ASeat::SetUIEnabled(const bool X)
 {
-	isUIEnabled = x;
+	//Enable flag for Widget to make UI visible
+	IsUIEnabled = X;
+	
+	if (IsUIEnabled)
+	{
+		//start timer for lag for its disappearance, snake effect
+		GetWorldTimerManager().SetTimer(UITimer, this, &ASeat::UITimerExpired,0.25,false);
+	}
+	else
+	{
+		//Reset Timer
+		GetWorldTimerManager().ClearTimer(UITimer);
+	}
+	
 }
-
-bool ASeat::GetUIEnabled()
+//Return UI state
+bool ASeat::GetUIEnabled()const
 {
-	return isUIEnabled;
+	return IsUIEnabled;
+}
+//Called from function in class
+void ASeat::UITimerExpired()
+{
+	//turn off UI
+	SetUIEnabled(false);
 }
 
-FString ASeat::GetSeatID()
+
+//Seat Seat ID
+FString ASeat::GetSeatID()const
 {
 	return (this->GetName()).Mid(4,2);
 }
 
-void ASeat::SetOccupied(bool x)
+//Set occupancy and ALSO light status
+void ASeat::SetOccupied(const bool X)
 {
-	isOccupied = x;
-	(isOccupied) ? IndicatorLight->SetVisibility(false) : IndicatorLight->SetVisibility(true);
+	IsOccupied = X;
+	(IsOccupied) ? IndicatorLight->SetVisibility(false) : IndicatorLight->SetVisibility(true);
 }
-
-bool ASeat::GetOccupied()
+//Return occupancy
+bool ASeat::GetOccupied()const
 {
-	return isOccupied;
+	return IsOccupied;
 }

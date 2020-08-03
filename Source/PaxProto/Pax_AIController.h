@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class PAXPROTO_API APax_AIController : public AAIController
+class PAXPROTO_API APax_AIController final : public AAIController
 {
 	GENERATED_BODY()
 	
