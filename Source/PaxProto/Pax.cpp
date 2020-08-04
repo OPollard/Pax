@@ -202,6 +202,13 @@ void APax::ManageTargetPost()
 		TargetPlace = ETarget::TOILET;
 
 		//Cabin manager will need to know who is in the toilet TODO
+		if (!State->GetOnboard())
+		{
+			//Get Cabin Manager
+			Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
+			if (Manager) Manager->RegisterNewPax(this);
+			if (State) State->SetOnboard(true);
+		}
 	}
 	else
 	{
