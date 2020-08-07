@@ -55,6 +55,8 @@ public:
 	bool GetViewStatInfo()const;
 
 	void UpdateState()const;
+	void SetEnableStateUpdate(bool X);
+	bool GetEnableStateUpdate()const;
 
 	// Utility Functions	/////////////////////////////
 
@@ -63,7 +65,7 @@ public:
 	void AdaptSpeeds()const;
 
 	UFUNCTION(BlueprintCallable)
-	void SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors)const;
+	void SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors);
 	UFUNCTION(BlueprintCallable)
 		ETarget GetTargetPlace()const;
 		
@@ -80,6 +82,7 @@ public:
 private:
 	
 	//Variables
+	bool EnableStateUpdate;
 	bool EnableStatInfo;
 	ETarget TargetPlace;
 

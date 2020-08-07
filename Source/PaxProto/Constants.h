@@ -27,8 +27,10 @@
 #define CASH_DROP 100.0f
 
 // Level Times
+#define FREEFLIGHT_WARNINGTIME 30.0f
 #define FREEFLIGHT_BOARDINGTIME 120.0f
 #define FREEFLIGHT_CRUISETIME 300.0f
+
 
 
 //Ranks - not accurate

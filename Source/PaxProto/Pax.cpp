@@ -29,6 +29,8 @@ void APax::BeginPlay()
 	//Targets walk location to current spawned spot
 	DeployLocation = this->GetActorLocation();
 
+	EnableStateUpdate = false;
+
 	//Calibrate Offsets
 	SeatDeployLocationOffset = FVector(0.0f, 40.0f, 0.0f);
 	ToiletDeployLocationOffset = FVector(120.0f, 0.0f, 0.0f);
@@ -108,9 +110,18 @@ bool APax::GetViewStatInfo()const
 //Redirects function to state so it updates, called repeatable from timer in begin play
 void APax::UpdateState()const
 {
-	State->UpdateCores();
+	if(EnableStateUpdate) State->UpdateCores();
 }
 
+void APax::SetEnableStateUpdate(bool X)
+{
+	EnableStateUpdate = X;
+}
+
+bool APax::GetEnableStateUpdate()const
+{
+	return EnableStateUpdate;
+}
 //Checks what the target is, eg toilet, seat
 void APax::ManageTarget(AActor* Target)
 {	
@@ -240,7 +251,7 @@ void APax::AdaptSpeeds()const
 }
 
 // PER TICK :Receives overlap actors, calculates social bias
-void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActors)const
+void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActors)
 {
 	if (FoundActors)
 	{
