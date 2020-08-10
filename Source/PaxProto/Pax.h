@@ -11,12 +11,13 @@ class ASeat;
 class AToilet;
 class UPaxState;
 class ACabinManager;
+class AWaitingArea;
 
 //Pax desired location
 UENUM()
 enum ETarget
 {
-	SELF, TARGETSEAT, CURRENTSEAT, TOILET, NUMOFTARGETS
+	SELF, TARGETSEAT, CURRENTSEAT, TOILET, WAITINGAREA, NUMOFTARGETS
 };
 
 UCLASS()
@@ -101,6 +102,7 @@ private:
 	AToilet* CurrentToilet = nullptr;
 	UPaxState* State = nullptr;
 	ACabinManager* Manager = nullptr;
+	AWaitingArea* WaitingArea = nullptr;
 
 	//Timers
 	FTimerHandle PaxTimerHandle;

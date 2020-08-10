@@ -11,6 +11,7 @@
 #include "PaxState.h"
 #include "Constants.h"
 #include "CabinManager.h"
+#include "WaitingArea.h"
 
 // Sets default values
 APax::APax()
@@ -129,6 +130,7 @@ void APax::ManageTarget(AActor* Target)
 		//Set Casts
 		TargetSeat = Cast<ASeat>(Target);
 		Toilet = Cast<AToilet>(Target);
+		WaitingArea = Cast<AWaitingArea>(Target);
 
 		//if target is seat
 		if (TargetSeat && State->IsAlive())
@@ -176,6 +178,15 @@ void APax::ManageTarget(AActor* Target)
 				ManageTargetPost();
 			}
 		}
+
+		//if target is waiting area
+		if (WaitingArea && State->IsAlive())
+		{
+			if(!WaitingArea->GetOccupied())
+			{
+				ManageTargetPost();
+			}
+		}
 	
 	
 }
@@ -220,6 +231,12 @@ void APax::ManageTargetPost()
 			if (Manager) Manager->RegisterNewPax(this);
 			if (State) State->SetOnboard(true);
 		}
+	}
+
+	else if(WaitingArea)
+	{
+		SetDeployLocation(WaitingArea->GetActorLocation());
+		TargetPlace = ETarget::WAITINGAREA;
 	}
 	else
 	{
