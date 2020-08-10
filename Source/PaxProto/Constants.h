@@ -31,6 +31,8 @@
 #define FREEFLIGHT_BOARDINGTIME 120.0f
 #define FREEFLIGHT_CRUISETIME 300.0f
 
+// Penalties
+#define DEATH_PENALTY -2500.0f
 
 
 //Ranks - not accurate

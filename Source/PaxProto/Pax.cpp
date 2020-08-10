@@ -12,6 +12,7 @@
 #include "Constants.h"
 #include "CabinManager.h"
 #include "WaitingArea.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 APax::APax()
@@ -20,6 +21,7 @@ APax::APax()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	State = CreateDefaultSubobject<UPaxState>(TEXT("State"));
+	DeathScream = CreateDefaultSubobject<UAudioComponent>(TEXT("Death Scream"));
 }
 
 // Called when the game starts or when spawned
@@ -235,14 +237,28 @@ void APax::ManageTargetPost()
 
 	else if(WaitingArea)
 	{
+		//Set deploy location and target so we can make this a nullptr
 		SetDeployLocation(WaitingArea->GetActorLocation());
 		TargetPlace = ETarget::WAITINGAREA;
+		//Remove previous occupancy
+		if (CurrentSeat) CurrentSeat->SetOccupied(false);
+		//New occupancy triggered on overlap
+
+		//Cabin manager will need to know who is in the waiting area TODO
+		if (!State->GetOnboard())
+		{
+			//Get Cabin Manager
+			Manager = Cast<ACabinManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACabinManager::StaticClass()));
+			if (Manager) Manager->RegisterNewPax(this);
+			if (State) State->SetOnboard(true);
+		}
 	}
 	else
 	{
 		return;
 	}
 }
+
 
 //Changes Pax walk speed depending on age
 void APax::AdaptSpeeds()const

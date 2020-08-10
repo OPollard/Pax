@@ -12,6 +12,7 @@ class AToilet;
 class UPaxState;
 class ACabinManager;
 class AWaitingArea;
+class UAudioComponent;
 
 //Pax desired location
 UENUM()
@@ -77,9 +78,12 @@ public:
 	void TargetSeatAcquiring();
 	void CurrentSeatAcquiring();
 	void ToiletAcquiring()const;
-	void CheckIsMoving()const;
-
+	void CheckIsMoving()const;	
 	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAudioComponent* DeathScream = nullptr;
+
 private:
 	
 	//Variables
@@ -103,6 +107,8 @@ private:
 	UPaxState* State = nullptr;
 	ACabinManager* Manager = nullptr;
 	AWaitingArea* WaitingArea = nullptr;
+
+	
 
 	//Timers
 	FTimerHandle PaxTimerHandle;

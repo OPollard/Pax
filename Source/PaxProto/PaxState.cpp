@@ -288,6 +288,16 @@ bool UPaxState::GetMoving()const
 	return Moving;
 }
 
+void UPaxState::SetWaitArea(bool X)
+{
+	WaitArea = X;
+}
+
+bool UPaxState::GetWaitArea()const
+{
+	return WaitArea;
+}
+
 // Returns money stat as FText format for the UI
 FText UPaxState::GetMoneyAsText()const
 {

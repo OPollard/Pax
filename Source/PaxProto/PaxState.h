@@ -120,6 +120,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetMoving()const;
 
+	void SetWaitArea(bool X);
+	bool GetWaitArea()const;
+
 	UFUNCTION(BlueprintPure)
 	FText GetMoneyAsText()const;
 	float GetMoney()const;
@@ -151,6 +154,7 @@ private:
 	bool Floating;
 	bool Moving;
 	bool InToilet;
+	bool WaitArea{ false };
 	
 	//Core Values
 	float Nutrition{ 100.00f };
