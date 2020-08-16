@@ -69,7 +69,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors);
 	UFUNCTION(BlueprintCallable)
-		ETarget GetTargetPlace()const;
+	ETarget GetTargetPlace()const;
 		
 	// Utility TICK Functions //////////////////////
 
@@ -83,6 +83,8 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAudioComponent* DeathScream = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPaxState* State = nullptr;
 
 private:
 	
@@ -104,7 +106,7 @@ private:
 	ASeat* CurrentSeat = nullptr;
 	AToilet* Toilet = nullptr;
 	AToilet* CurrentToilet = nullptr;
-	UPaxState* State = nullptr;
+
 	ACabinManager* Manager = nullptr;
 	AWaitingArea* WaitingArea = nullptr;
 

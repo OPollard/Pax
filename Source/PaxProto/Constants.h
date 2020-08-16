@@ -37,7 +37,6 @@
 // Penalties
 #define DEATH_PENALTY -2500.0f
 
-
 //Ranks - not accurate
 #define BEGINNER_CAP 20000.0
 #define INTERMEDIATE_CAP 40000.0

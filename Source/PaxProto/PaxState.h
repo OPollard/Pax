@@ -57,45 +57,43 @@ public:
 	bool SpawnMoney()const;
 
 	UFUNCTION(BlueprintPure)
-		EGeneration GetAgeGroup()const;
+	EGeneration GetAgeGroup()const;
 	
 	UFUNCTION(BlueprintPure)
-		EPoliteness GetPoliteness()const;
+	EPoliteness GetPoliteness()const;
 
 	UFUNCTION(BlueprintPure)
-		int32 GetAge()const;
+	int32 GetAge()const;
 
 	UFUNCTION(BlueprintPure)
-		FString GetName()const;
+	FString GetName()const;
 
 	//Change indicator code so that it returns a state of increase or
 	//decrease such as big decrease -2, small decrease -1, neutral 0 etc
 	UFUNCTION(BlueprintPure)
-		float GetNutrition()const;
+	float GetNutrition()const;
 	UFUNCTION(BlueprintPure)
-		int32 GetNutritionIndicator()const;
+	int32 GetNutritionIndicator()const;
 
 	void SetExcrement(float Value);
 	UFUNCTION(BlueprintPure)
-		float GetExcrement()const;
+	float GetExcrement()const;
 	UFUNCTION(BlueprintPure)
-		int32 GetExcrementIndicator()const;
+	int32 GetExcrementIndicator()const;
 
 	UFUNCTION(BlueprintPure)
-		float GetSocietal()const;
+	float GetSocietal()const;
 	UFUNCTION(BlueprintPure)
-		int32 GetSocialIndicator()const;
+	int32 GetSocialIndicator()const;
 	void SetSocialBias(float Value);
 
 	UFUNCTION(BlueprintPure)
-		float GetEnergy()const;
+	float GetEnergy()const;
 	UFUNCTION(BlueprintPure)
-		int32 GetEnergyIndicator() const;
-	
-	
+	int32 GetEnergyIndicator() const;
 
 	UFUNCTION(BlueprintPure)
-		float GetAnimPlaySpeed()const;
+	float GetAnimPlaySpeed()const;
 
 	void SetAnimPlaySpeed(float WalkSpeed);
 
@@ -139,14 +137,16 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<AMoney> MoneyActor;
 
-	
-
 private:
 
 	int32 Age{ 0 };
-	EGeneration AgeGroup;
-	EPoliteness Politeness;
-	EWealth Wealthiness;
+	UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EGeneration> AgeGroup;
+	UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EPoliteness> Politeness;
+	UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EWealth> Wealthiness;
+	UPROPERTY(VisibleAnywhere)
 	float Money{ 0.0f };
 
 	bool Onboard{ false };
