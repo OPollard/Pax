@@ -25,11 +25,14 @@
 
 // Money - ref Pax State
 #define CASH_DROP 100.0f
+#define FIRSTCLASS_RATIO 0.9f
+#define BUSINESS_RATIO 0.6f
+#define ECONOMY_RATIO 0.3f
 
 // Level Times
 #define FREEFLIGHT_WARNINGTIME 30.0f
 #define FREEFLIGHT_BOARDINGTIME 120.0f
-#define FREEFLIGHT_CRUISETIME 300.0f
+#define FREEFLIGHT_CRUISETIME 10.0f // 300.0f
 
 // Penalties
 #define DEATH_PENALTY -2500.0f
