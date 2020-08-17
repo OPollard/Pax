@@ -65,51 +65,50 @@ void UPaxState::Initialise()
 // Called every second from Pax.cpp
 void UPaxState::UpdateCores()
 {
+		//Temporary Setting of Indicators
+		NutritionChx = NUTRITION_CHX_AVG;
+		EnergyChx = ENERGY_CHX_AVG;
+		ExcrementChx = EXCREMENT_CHX_AVG;
 
-	//Temporary Setting of Indicators
-	NutritionChx = NUTRITION_CHX_AVG;
-	EnergyChx = ENERGY_CHX_AVG;
-	ExcrementChx = EXCREMENT_CHX_AVG;
+		//Update Attributes
+		Nutrition += NutritionChx;
+		Energy += EnergyChx;
+		Excrement += ExcrementChx;
+		Societal += SocialBias;
 
-	//Update Attributes
-	Nutrition += NutritionChx;
-	Energy += EnergyChx;
-	Excrement += ExcrementChx;
-	Societal += SocialBias;
-
-	//If not alive
-	if (!IsAlive())
-	{
-		if (!AnnouncedDeath) //and not announced
+		//If not alive
+		if (!IsAlive())
 		{
-			OnDeath.Broadcast();
-			AnnouncedDeath = true;
-			Moving = false;
-		}
-
-	}
-	else //assumes alive
-	{
-		//if DeltaSum is below spawn threshold
-		if (DeltaSum < MoneyDropLimit)
-		{
-			//higher stats the better the delta, excrement is best at 0, represents a ratio of maximum best stats and makes that a ratio of maximum earned per tick
-			Delta = static_cast<int>(((Nutrition + Energy + (FMath::Abs(Excrement - 100.0f) + Societal)) / 400) * DrainDatum);
-			DeltaSum += Delta;
-			//If the delta goes over our limit, cap it and prevent further growth
-			if (DeltaSum > MoneyDropLimit) { DeltaSum = MoneyDropLimit; }
-		}
-		else //must be over spawn threshold
-		{
-			//if( !awaiting a pickup)
-			if (!AwaitingPickup)
+			if (!AnnouncedDeath) //and not announced
 			{
-				//if spawn successful, set awaiting pickup true to avoid more spawns
-				AwaitingPickup = (SpawnMoney()) ? true : false;	
+				OnDeath.Broadcast();
+				AnnouncedDeath = true;
+				Moving = false;
+			}
+
+		}
+		else //assumes alive
+		{
+			//if DeltaSum is below spawn threshold
+			if (DeltaSum < MoneyDropLimit)
+			{
+				//higher stats the better the delta, excrement is best at 0, represents a ratio of maximum best stats and makes that a ratio of maximum earned per tick
+				Delta = static_cast<int>(((Nutrition + Energy + (FMath::Abs(Excrement - 100.0f) + Societal)) / 400) * DrainDatum);
+				DeltaSum += Delta;
+				//If the delta goes over our limit, cap it and prevent further growth
+				if (DeltaSum > MoneyDropLimit) { DeltaSum = MoneyDropLimit; }
+
+			}
+			else //must be over spawn threshold
+			{
+				//if( !awaiting a pickup)
+				if (!AwaitingPickup)
+				{
+					//if spawn successful, set awaiting pickup true to avoid more spawns
+					AwaitingPickup = (SpawnMoney()) ? true : false;
+				}
 			}
 		}
-	}
-	
 }
 
 //spawn money overhead PAX, and await cursor ahead. Functionality in money.cpp
