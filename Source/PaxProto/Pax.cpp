@@ -347,7 +347,7 @@ void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActo
 				else if (Bias < 0.0f) NearbyPax->SetInfluenceAffect(EInfluenceAffect::NEGATIVE);
 				else NearbyPax->SetInfluenceAffect(EInfluenceAffect::NONE);
 				//if the found actor is sitting down, enable overlay
-				if(State->GetFloating()) NearbyPax->SetEnableTextureOverlay(true);
+				if(State->GetFloating() || EnableStatInfo) NearbyPax->SetEnableTextureOverlay(true);
 			}
 			//DISTANCE MODIFIER
 			Bias = Bias - (Bias * (FMath::Clamp((GetDistanceTo(NearbyActors[i])), 0.0f, INFLUENCE_RANGE) / INFLUENCE_RANGE));
