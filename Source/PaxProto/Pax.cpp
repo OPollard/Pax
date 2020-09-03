@@ -33,6 +33,8 @@ void APax::BeginPlay()
 	DeployLocation = this->GetActorLocation();
 
 	EnableStateUpdate = false;
+	//Toggles the overlay to change head colour green/red depending on positive/negative bias on sphere overlap
+	EnableTextureOverlay = false;
 
 	//Calibrate Offsets
 	SeatDeployLocationOffset = FVector(0.0f, 40.0f, 0.0f);
@@ -57,6 +59,10 @@ void APax::Tick(float DeltaTime)
 	//Controls deployment target, corrects snapping and enables/disables seat hopping
 	TargetAcquiring();
 
+	//if not floating, make sure the overlay colour is reset
+	if(!State->GetFloating()) SetEnableTextureOverlay(false);
+
+
 }
 
 // Called to bind functionality to input
@@ -65,16 +71,17 @@ void APax::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-
 //called from player controller
 void APax::Clicked()
 {
+		
 		SetPreMoveLocation(this->GetActorTransform());
 		State->ResetStates();
 		State->SetFloating(true);
 }
 void APax::Released()
 {
+		
 		State->SetFloating(false);
 		SetActorTransform(this->GetPreMoveLocation());
 }
@@ -205,7 +212,6 @@ void APax::ManageTargetPost()
 		this->SetCanAffectNavigationGeneration(true);
 		//Redirect path for tick
 		TargetPlace = ETarget::TARGETSEAT;
-		
 
 		//Cabin Manager needs to know about the new pax OnBoard
 		if (!State->GetOnboard())
@@ -283,6 +289,18 @@ void APax::AdaptSpeeds()const
 	Pax_Movement->RotationRate.Yaw = (Pax_Movement->MaxWalkSpeed / ADULT_WALK_SPEED) * STANDARD_ROTATION_SPEED;
 }
 
+//Set Seat Location for overlap location
+void APax::SetSphereSpawnLocation(FVector Location)
+{
+	FloatingPaxSphereLocation = Location;
+}
+
+//Get Seat Location for overlap location
+FVector APax::GetSphereSpawnLocation()
+{
+	return FloatingPaxSphereLocation;
+}
+
 // PER TICK :Receives overlap actors, calculates social bias
 void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActors)
 {
@@ -320,16 +338,40 @@ void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActo
 					(ActorState->GetPoliteness() == SOCIAL) ? ++Bias : --Bias; //assumes unsocial if false
 				}
 			}
+			//Get reference to found actor
+			APax* NearbyPax = Cast<APax>(NearbyActors[i]);
+			if (NearbyPax)
+			{
+				//Set influence state appropriately, to trigger correct overlay
+				if (Bias > 0.0f) NearbyPax->SetInfluenceAffect(EInfluenceAffect::POSITIVE);
+				else if (Bias < 0.0f) NearbyPax->SetInfluenceAffect(EInfluenceAffect::NEGATIVE);
+				else NearbyPax->SetInfluenceAffect(EInfluenceAffect::NONE);
+				//if the found actor is sitting down, enable overlay
+				if(State->GetFloating()) NearbyPax->SetEnableTextureOverlay(true);
+			}
 			//DISTANCE MODIFIER
-			Bias = Bias - (Bias * (FMath::Clamp((GetDistanceTo(NearbyActors[i])), 0.0f, 90.0f) / INFLUENCE_RANGE));
+			Bias = Bias - (Bias * (FMath::Clamp((GetDistanceTo(NearbyActors[i])), 0.0f, INFLUENCE_RANGE) / INFLUENCE_RANGE));
 			//Sum Up All Nearby Actors Influence
 			GroupBias += Bias;
+			//Create Average Bias over all overlapping actors
+			GroupBias /= NumOfActors;
+			//send to pax state	
+			State->SetSocialBias(GroupBias);
 		}
-		//Create Average Bias over all overlapping actors
-		GroupBias /= NumOfActors;
-		//send to pax state	
-		State->SetSocialBias(GroupBias);
 	}
+}
+
+
+//set texture overlay toggle
+void APax::SetEnableTextureOverlay(bool X)
+{
+	EnableTextureOverlay = X;
+}
+
+//fetch overlay toggle, used in BP
+bool APax::GetEnableTextureOverlay()
+{
+	return EnableTextureOverlay;
 }
 
 //called every tick, senses seat occupancy,distance,snapping
@@ -407,4 +449,16 @@ void APax::CheckIsMoving()const
 ETarget APax::GetTargetPlace()const
 {
 	return TargetPlace;
+}
+
+//Get influence affect state enum
+EInfluenceAffect APax::GetInfluenceAffect()
+{
+	return InfluenceAffect;
+}
+
+//Set influence affect state
+void APax::SetInfluenceAffect(EInfluenceAffect Affect)
+{
+	InfluenceAffect = Affect;
 }

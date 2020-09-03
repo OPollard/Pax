@@ -167,5 +167,10 @@ void AMyPlayerController::SendTriggerToTarget() const
 		{
 			Seat->SetUIEnabled(true);
 		}
+		//if we have a pax, set the seat as the sphere overlap spawn location
+		if (PaxHandle)
+		{
+			PaxHandle->SetSphereSpawnLocation(Target->GetActorLocation());
+		}
 	}
 }

@@ -10,7 +10,7 @@
 //Pax Variables
 #define SEAT_SNAP_RANGE 50.0f
 //Set in Pax_BP
-#define INFLUENCE_RANGE 90.0f
+#define INFLUENCE_RANGE 100.0f //90.0f
 
 //Pax State
 #define NUTRITION_CHX_AVG -0.2f // 2.0f

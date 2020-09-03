@@ -20,6 +20,12 @@ enum ETarget
 {
 	SELF, TARGETSEAT, CURRENTSEAT, TOILET, WAITINGAREA, NUMOFTARGETS
 };
+//Pax Influence Affect
+UENUM()
+enum EInfluenceAffect
+{
+	NEGATIVE, NONE, POSITIVE, NUMOFAFFECTS
+};
 
 UCLASS()
 class PAXPROTO_API APax final : public ACharacter
@@ -66,21 +72,33 @@ public:
 	void ManageTargetPost();
 	void AdaptSpeeds()const;
 
+	void SetSphereSpawnLocation(FVector Location);
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetSphereSpawnLocation();
+
 	UFUNCTION(BlueprintCallable)
 	void SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors);
+
 	UFUNCTION(BlueprintCallable)
 	ETarget GetTargetPlace()const;
+
+	UFUNCTION(BlueprintCallable)
+	EInfluenceAffect GetInfluenceAffect();
+	void SetInfluenceAffect(EInfluenceAffect Affect);
 		
 	// Utility TICK Functions //////////////////////
 
+	void SetEnableTextureOverlay(bool X);//TODO confirm
+	UFUNCTION(BlueprintCallable)
+	bool GetEnableTextureOverlay();  //TODO confirm
 	void TargetAcquiring();
 	void SelfAcquiring();
 	void TargetSeatAcquiring();
 	void CurrentSeatAcquiring();
 	void ToiletAcquiring()const;
 	void CheckIsMoving()const;	
-	
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAudioComponent* DeathScream = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -89,14 +107,18 @@ public:
 private:
 	
 	//Variables
+	bool EnableTextureOverlay;
 	bool EnableStateUpdate;
 	bool EnableStatInfo;
 	ETarget TargetPlace;
+	UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EInfluenceAffect> InfluenceAffect;
 
 	//Locations and offset targets (to avoid Pax targeting middle of a mesh)
 	FVector DeployLocation;
 	FVector SeatDeployLocationOffset;
 	FVector ToiletDeployLocationOffset;
+	FVector FloatingPaxSphereLocation;
 
 	//Cached orientation
 	FTransform PreMoveTransform;
@@ -109,8 +131,6 @@ private:
 
 	ACabinManager* Manager = nullptr;
 	AWaitingArea* WaitingArea = nullptr;
-
-	
 
 	//Timers
 	FTimerHandle PaxTimerHandle;
