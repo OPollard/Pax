@@ -142,7 +142,7 @@ void APax::ManageTarget(AActor* Target)
 		WaitingArea = Cast<AWaitingArea>(Target);
 
 		//if target is seat
-		if (TargetSeat && State->IsAlive())
+		if (TargetSeat && State->IsAlive() && !State->IsTired())
 		{
 			//empty seat
 			if (!TargetSeat->GetOccupied())
@@ -168,7 +168,7 @@ void APax::ManageTarget(AActor* Target)
 		}
 
 		//if target is a toilet
-		if (Toilet && State->IsAlive())
+		if (Toilet && State->IsAlive() && !State->IsTired())
 		{
 	
 			//empty toilet
@@ -189,7 +189,7 @@ void APax::ManageTarget(AActor* Target)
 		}
 
 		//if target is waiting area
-		if (WaitingArea && State->IsAlive())
+		if (WaitingArea && State->IsAlive() && !State->IsTired())
 		{
 			if(!WaitingArea->GetOccupied())
 			{

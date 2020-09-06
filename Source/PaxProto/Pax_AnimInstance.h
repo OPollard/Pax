@@ -33,6 +33,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PaxState)
 		bool IsAlive;
 
+	// Trigger for sleeping animation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PaxState)
+		bool IsTired;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PaxState)
+		bool IsUncomfortable;
+
 	// Handle to hold speed, accessible through anim_bp
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PaxState)
 		float Pax_WalkSpeed;

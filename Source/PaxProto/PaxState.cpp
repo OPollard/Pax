@@ -70,12 +70,6 @@ void UPaxState::UpdateCores()
 		EnergyChx = ENERGY_CHX_AVG;
 		ExcrementChx = EXCREMENT_CHX_AVG;
 
-		//Update Attributes
-		Nutrition += NutritionChx;
-		Energy += EnergyChx;
-		Excrement += ExcrementChx;
-		Societal += SocialBias;
-
 		//If not alive
 		if (!IsAlive())
 		{
@@ -85,10 +79,25 @@ void UPaxState::UpdateCores()
 				AnnouncedDeath = true;
 				Moving = false;
 			}
-
+		}
+		//if needs to sleep
+		if (IsTired() && !GetMoving())
+		{
+			if (!AnnouncedSleep)
+			{
+				Sleep.Broadcast();
+				AnnouncedSleep = true;
+				Moving = false;
+			}
 		}
 		else //assumes alive
 		{
+			//Update Attributes
+			Nutrition += NutritionChx;
+			Energy += EnergyChx;
+			Excrement += ExcrementChx;
+			Societal += SocialBias;
+
 			//if DeltaSum is below spawn threshold
 			if (DeltaSum < MoneyDropLimit)
 			{
@@ -202,6 +211,11 @@ void UPaxState::SetSocialBias(const float Value)
 	SocialBias = Value;
 }
 
+void UPaxState::SetEnergy(float Value)
+{
+	Energy = Value;
+}
+
 float UPaxState::GetEnergy()const
 {
 	return Energy;
@@ -214,6 +228,11 @@ int32 UPaxState::GetEnergyIndicator()const
 	else if (EnergyChx > 0.5f) return LARGEINCREASE;
 	else if (EnergyChx > 0.0f) return SMALLINCREASE;
 	else return NOCHANGE;
+}
+
+void UPaxState::SetAnnouncedSleep(bool X)
+{
+	AnnouncedSleep = X;
 }
 
 
@@ -340,4 +359,16 @@ bool UPaxState::IsAlive()
 {
 	Alive = (Nutrition < 1) ? false : true;
 	return Alive;
+}
+
+//Tiredness is currently dependant on amount of energy
+bool UPaxState::IsTired()
+{
+	return (Energy < 1) ? true : false;
+}
+
+//Uncomfortable status currently depends on Toilet or Social
+bool UPaxState::IsUncomfortable()
+{
+	return ((Excrement > 99) || (Societal < 1)) ? true : false;
 }

@@ -38,6 +38,10 @@ void UPax_AnimInstance::NativeUpdateAnimation(float DeltaTimeX)
 
 	IsAlive = (PaxState->IsAlive());
 
+	IsTired = (PaxState->IsTired());
+
+	IsUncomfortable = (PaxState->IsUncomfortable());
+
 }
 
 // Fetch anim play speed from pax state

@@ -49,6 +49,7 @@ public:
 
 	//Delegate to be broadcast across the game
 	FPaxDelegate OnDeath;
+	FPaxDelegate Sleep;
 
 	void Initialise();
 
@@ -87,10 +88,12 @@ public:
 	int32 GetSocialIndicator()const;
 	void SetSocialBias(float Value);
 
+	void SetEnergy(float Value);
 	UFUNCTION(BlueprintPure)
 	float GetEnergy()const;
 	UFUNCTION(BlueprintPure)
 	int32 GetEnergyIndicator() const;
+	void SetAnnouncedSleep(bool X);
 
 	UFUNCTION(BlueprintPure)
 	float GetAnimPlaySpeed()const;
@@ -104,6 +107,7 @@ public:
 	bool GetOnboard()const;
 
 	void SetSitting(bool X);
+	UFUNCTION(BlueprintPure)
 	bool GetSitting()const;
 
 	void SetFloating(bool X);
@@ -133,6 +137,8 @@ public:
 	bool GetAwaitingPickup()const;
 
 	bool IsAlive();
+	bool IsTired();
+	bool IsUncomfortable();
 	
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<AMoney> MoneyActor;
@@ -177,6 +183,7 @@ private:
 	bool AwaitingPickup{ false };
 	bool Alive{ true };
 	bool AnnouncedDeath{ false };
+	bool AnnouncedSleep{ false };
 	float AnimationPlaySpeed{ };
 
 	FString Name = "Nobody";
