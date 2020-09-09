@@ -13,13 +13,14 @@
 #define INFLUENCE_RANGE 100.0f //90.0f
 
 //Pax State
-#define NUTRITION_CHX_AVG -1.0f // 2.0f
+#define NUTRITION_CHX_AVG -0.0f // 2.0f
 #define ENERGY_CHX_AVG -5.0f //-0.5f
 #define EXCREMENT_CHX_AVG 0.5f // 0.25f
 #define SOCIAL_CHX_AVG 0.0f
 
-//Pax Sleep Time
+//Gameplay Timings
 #define SLEEP_TIME 10.0f
+#define SERVICE_RECHARGE_TIME 20.0f //30.0f
 
 //Starting Money
 #define START_MONEY_POOR 1250.0f
@@ -36,7 +37,7 @@
 // Level Times
 #define FREEFLIGHT_WARNINGTIME 30.0f
 #define FREEFLIGHT_BOARDINGTIME 120.0f
-#define FREEFLIGHT_CRUISETIME 5.0f // 300.0f
+#define FREEFLIGHT_CRUISETIME 300.0f 
 
 // Penalties
 #define DEATH_PENALTY -2500.0f

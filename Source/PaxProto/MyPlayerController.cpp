@@ -40,7 +40,6 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction(FName("LeftClick"), EInputEvent::IE_Pressed, this, &AMyPlayerController::SetClicked);
 	InputComponent->BindAction(FName("LeftClick"), EInputEvent::IE_Released, this, &AMyPlayerController::SetReleased);
 	
-	
 }
 
 void AMyPlayerController::Tick(float DeltaTime)
