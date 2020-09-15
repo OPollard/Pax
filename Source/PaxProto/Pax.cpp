@@ -12,6 +12,7 @@
 #include "Constants.h"
 #include "CabinManager.h"
 #include "WaitingArea.h"
+#include "Cart.h"
 #include "Components/AudioComponent.h"
 
 // Sets default values
@@ -22,6 +23,9 @@ APax::APax()
 	
 	State = CreateDefaultSubobject<UPaxState>(TEXT("State"));
 	DeathScream = CreateDefaultSubobject<UAudioComponent>(TEXT("Death Scream"));
+	BlockedHuff = CreateDefaultSubobject<UAudioComponent>(TEXT("Blocked Huff"));
+	Accept = CreateDefaultSubobject<UAudioComponent>(TEXT("Accept "));
+	StatFillUp = CreateDefaultSubobject<UAudioComponent>(TEXT("Stat Fill Up "));
 }
 
 // Called when the game starts or when spawned
@@ -35,10 +39,14 @@ void APax::BeginPlay()
 	EnableStateUpdate = false;
 	//Toggles the overlay to change head colour green/red depending on positive/negative bias on sphere overlap
 	EnableTextureOverlay = false;
+	FoodRequest = false;
 
 	//Calibrate Offsets
 	SeatDeployLocationOffset = FVector(0.0f, 40.0f, 0.0f);
 	ToiletDeployLocationOffset = FVector(120.0f, 0.0f, 0.0f);
+	
+	//Get reference to service cart
+	Cart = Cast<ACart>(UGameplayStatics::GetActorOfClass(GetWorld(), ACart::StaticClass()));
 
 	//Change walk/rotation speed to age group buff/nerf
 	AdaptSpeeds();
@@ -62,9 +70,32 @@ void APax::Tick(float DeltaTime)
 	//if not floating, make sure the overlay colour is reset
 	if(!State->GetFloating()) SetEnableTextureOverlay(false);
 
-
+	//Check for service trolley
+	if (Cart && !FoodRequest)
+	{
+		if (FMath::IsNearlyEqual(Cart->GetActorLocation().Y, this->GetActorLocation().Y, 1.0f))
+		{
+			FoodOrder_Implementation();
+			FoodOrder();
+		}
+	}
 }
 
+//function called when abeam cart
+void APax::FoodOrder_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("YUMMY"));
+	State->SetNutrition(100.0f);
+	StatFillUp->Play();
+	FoodRequest = true;
+	GetWorldTimerManager().SetTimer(PaxFoodRequestHandle, this, &APax::FoodOrderReset, 2.0f, false);
+}
+
+//reset food request
+void APax::FoodOrderReset()
+{
+	FoodRequest = false;
+}
 // Called to bind functionality to input
 void APax::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -141,63 +172,99 @@ void APax::ManageTarget(AActor* Target)
 		Toilet = Cast<AToilet>(Target);
 		WaitingArea = Cast<AWaitingArea>(Target);
 
-		//if target is seat
-		if (TargetSeat && State->IsAlive() && !State->IsTired())
+		//check path is not blocked from service cart
+		if (Cart)
 		{
-			//empty seat
-			if (!TargetSeat->GetOccupied())
+			if (((Cart->GetActorLocation().Y < Target->GetActorLocation().Y)
+				&& (Cart->GetActorLocation().Y > this->GetActorLocation().Y))
+				|| ((Cart->GetActorLocation().Y > Target->GetActorLocation().Y)
+				&& (Cart->GetActorLocation().Y < this->GetActorLocation().Y)))
 			{
-				//do additional checks to avoid it occupying a seat but never making it due to path
-
-				//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
-				if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
+				//path blocked
+				BlockedHuff->Play();
+			}
+			else
+			{
+				//if target is seat
+				if (TargetSeat && State->IsAlive() && !State->IsTired())
 				{
-					//gets off chair to go to target
-					if (TargetPlace == ETarget::CURRENTSEAT)
+					//empty seat
+					if (!TargetSeat->GetOccupied())
 					{
-						this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
+						//do additional checks to avoid it occupying a seat but never making it due to path
+
+						//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
+						if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
+						{
+							//gets off chair to go to target
+							if (TargetPlace == ETarget::CURRENTSEAT)
+							{
+								this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
+							}
+							//gets out toilet to go to target
+							if (TargetPlace == ETarget::TOILET)
+							{
+								//set offset in blueprint toilet_bp when wanting to leave
+							}
+						}
+						//path accepted sound
+						Accept->Play();
+
+						ManageTargetPost();
 					}
-					//gets out toilet to go to target
-					if (TargetPlace == ETarget::TOILET)
+					else
 					{
-						//set offset in blueprint toilet_bp when wanting to leave
+						//seat unavailable
+						BlockedHuff->Play();
 					}
 				}
-				ManageTargetPost();
-			}
-		}
-
-		//if target is a toilet
-		if (Toilet && State->IsAlive() && !State->IsTired())
-		{
-	
-			//empty toilet
-			if (!Toilet->GetOccupied())
-			{
-				//do additional checks to avoid it occupying a seat but never making it due to path
-
-				//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
-				if (FVector::Dist(Toilet->GetActorLocation(), this->GetActorLocation()) > 60.0f)
+				//if target is a toilet
+				if (Toilet && State->IsAlive() && !State->IsTired())
 				{
-					if (CurrentSeat)
+
+					//empty toilet
+					if (!Toilet->GetOccupied())
 					{
-						this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
+						//do additional checks to avoid it occupying a seat but never making it due to path
+
+						//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
+						if (FVector::Dist(Toilet->GetActorLocation(), this->GetActorLocation()) > 60.0f)
+						{
+							if (CurrentSeat)
+							{
+								this->SetActorLocation(this->GetActorLocation() + SeatDeployLocationOffset);
+							}
+						}
+						//path accepted sound
+						Accept->Play();
+
+						ManageTargetPost();
+					}
+					else
+					{
+						//toilet unavailable
+						BlockedHuff->Play();
 					}
 				}
-				ManageTargetPost();
-			}
-		}
+				//if target is waiting area
+				if (WaitingArea && State->IsAlive() && !State->IsTired())
+				{
+					if (!WaitingArea->GetOccupied())
+					{
+						//path accepted sound
+						Accept->Play();
 
-		//if target is waiting area
-		if (WaitingArea && State->IsAlive() && !State->IsTired())
-		{
-			if(!WaitingArea->GetOccupied())
-			{
-				ManageTargetPost();
+						ManageTargetPost();
+					}
+					else
+					{
+						//toilet unavailable
+						BlockedHuff->Play();
+					}
+				}
 			}
 		}
-	
-	
+		
 }
 //Dirty post delay activations, after pax thinking time from seat
 void APax::ManageTargetPost()

@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird LTD - inclusive ©
 #pragma once
 
 //Pax
@@ -13,9 +13,18 @@
 #define INFLUENCE_RANGE 100.0f //90.0f
 
 //Pax State
-#define NUTRITION_CHX_AVG -0.0f // 2.0f
-#define ENERGY_CHX_AVG -5.0f //-0.5f
-#define EXCREMENT_CHX_AVG 0.5f // 0.25f
+#define NUTRITION_CHX_YNG -0.75f
+#define ENERGY_CHX_YNG -0.25f 
+#define EXCREMENT_CHX_YNG 1.25f 
+
+#define NUTRITION_CHX_AVG -1.25f // 2.0f
+#define ENERGY_CHX_AVG -0.75f //-0.5f
+#define EXCREMENT_CHX_AVG 0.25f // 0.25f
+
+#define NUTRITION_CHX_OLD -0.25f
+#define ENERGY_CHX_OLD -1.25f 
+#define EXCREMENT_CHX_OLD 0.75f 
+
 #define SOCIAL_CHX_AVG 0.0f
 
 //Gameplay Timings
@@ -43,7 +52,7 @@
 #define DEATH_PENALTY -2500.0f
 
 //Ranks - not accurate
-#define BEGINNER_CAP 20000.0
-#define INTERMEDIATE_CAP 40000.0
-#define EXPERT_CAP 60000.0
-#define SUPERHERO_CAP 80000.0
+#define BEGINNER_CAP 50000.0
+#define INTERMEDIATE_CAP 150000.0
+#define EXPERT_CAP 325000.0
+#define SUPERHERO_CAP 1000000.0

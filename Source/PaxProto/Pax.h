@@ -13,6 +13,7 @@ class UPaxState;
 class ACabinManager;
 class AWaitingArea;
 class UAudioComponent;
+class ACart;
 
 //Pax desired location
 UENUM()
@@ -99,8 +100,19 @@ public:
 	void ToiletAcquiring()const;
 	void CheckIsMoving()const;	
 
+	UFUNCTION(BlueprintNativeEvent)
+	void FoodOrder();
+	UFUNCTION(BlueprintCallable)
+	void FoodOrderReset();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAudioComponent* DeathScream = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAudioComponent* BlockedHuff = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAudioComponent* Accept = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAudioComponent* StatFillUp = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UPaxState* State = nullptr;
 
@@ -110,6 +122,8 @@ private:
 	bool EnableTextureOverlay;
 	bool EnableStateUpdate;
 	bool EnableStatInfo;
+	bool FoodRequest;
+
 	ETarget TargetPlace;
 	UPROPERTY(VisibleAnywhere)
 	TEnumAsByte<EInfluenceAffect> InfluenceAffect;
@@ -131,7 +145,9 @@ private:
 
 	ACabinManager* Manager = nullptr;
 	AWaitingArea* WaitingArea = nullptr;
+	ACart* Cart = nullptr;
 
 	//Timers
 	FTimerHandle PaxTimerHandle;
+	FTimerHandle PaxFoodRequestHandle;
 };

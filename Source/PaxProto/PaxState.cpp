@@ -60,16 +60,42 @@ void UPaxState::Initialise()
 	DrainDatum = Money / FREEFLIGHT_CRUISETIME;
 	//Adjust drop limit so that it takes longer for richer people to drop as their delta increases faster
 	MoneyDropLimit = CASH_DROP * WealthAdjustment; 
+
+	//Add slight variance to core starting values
+	Nutrition = (FMath::RandRange(80.0f, 100.0f));
+	Energy = (FMath::RandRange(20.0f, 80.0f));
+	Excrement = (FMath::RandRange(0.0f, 15.0f));
+	Societal = (FMath::RandRange(45.0f, 55.0f));
+
+	//Change constants based on age
+	switch (AgeGroup)
+	{
+		case YOUNG:
+			NutritionChx = NUTRITION_CHX_YNG;
+			EnergyChx = ENERGY_CHX_YNG;
+			ExcrementChx = EXCREMENT_CHX_YNG;
+			break;
+
+		case ADULT:
+			NutritionChx = NUTRITION_CHX_AVG;
+			EnergyChx = ENERGY_CHX_AVG;
+			ExcrementChx = EXCREMENT_CHX_AVG;
+			break;
+		case OLD:
+			NutritionChx = NUTRITION_CHX_OLD;
+			EnergyChx = ENERGY_CHX_OLD;
+			ExcrementChx = EXCREMENT_CHX_OLD;
+			break;
+		default:
+			break;
+	}
+		
 }
 
 // Called every second from Pax.cpp
 void UPaxState::UpdateCores()
 {
-		//Temporary Setting of Indicators
-		NutritionChx = NUTRITION_CHX_AVG;
-		EnergyChx = ENERGY_CHX_AVG;
-		ExcrementChx = EXCREMENT_CHX_AVG;
-
+			
 		//If not alive
 		if (!IsAlive())
 		{
@@ -157,6 +183,11 @@ EPoliteness UPaxState::GetPoliteness()const
 FString UPaxState::GetName()const
 {
 	return Name;
+}
+
+void UPaxState::SetNutrition(float Value)
+{
+	Nutrition = Value;
 }
 
 float UPaxState::GetNutrition()const
@@ -357,7 +388,10 @@ bool UPaxState::GetAwaitingPickup()const
 //Alive is currently dependant on amount of nutrition, may change or add late
 bool UPaxState::IsAlive()
 {
-	Alive = (Nutrition < 1) ? false : true;
+	if (Nutrition < 1)
+	{
+		Alive = false;
+	}
 	return Alive;
 }
 

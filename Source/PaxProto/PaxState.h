@@ -71,6 +71,7 @@ public:
 
 	//Change indicator code so that it returns a state of increase or
 	//decrease such as big decrease -2, small decrease -1, neutral 0 etc
+	void SetNutrition(float Value);
 	UFUNCTION(BlueprintPure)
 	float GetNutrition()const;
 	UFUNCTION(BlueprintPure)
