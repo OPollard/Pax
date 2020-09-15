@@ -1,14 +1,12 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 
 #include "Toilet.h"
 #include "Components/BoxComponent.h"
 #include "Components/RectLightComponent.h"
 
-// Sets default values
 AToilet::AToilet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Guard against having no root
@@ -38,21 +36,19 @@ AToilet::AToilet()
 	RearToiletOccupied = false;
 }
 
-// Called when the game starts or when spawned
 void AToilet::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void AToilet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-//Set occupancy status
+//Set appropriate toilet has occupied/unoccupied depending on which one is being challenged
 void AToilet::SetOccupied(const bool X)
 {
 	//Get world name
@@ -71,7 +67,7 @@ void AToilet::SetOccupied(const bool X)
 	IndicatorLight->SetIntensity(((X) ? 500.0f : 100.0f));
 }
 
-//Get occupancy status
+//Get appropriate toilet occupancy, depending on which is being challenged
 bool AToilet::GetOccupied()const
 {
 	//Get world name
@@ -87,14 +83,11 @@ bool AToilet::GetOccupied()const
 	}
 }
 
-
-//Set Occupier Actor
 void AToilet::SetOccupier(AActor* Pax)
 {
 	Occupier = Pax;
 }
 
-//Get Occupier Actor
 AActor* AToilet::GetOccupier() const
 {
 	return Occupier;

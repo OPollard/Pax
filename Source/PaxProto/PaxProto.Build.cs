@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 using UnrealBuildTool;
 

@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #pragma once
 
@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Pax.generated.h"
 
-//Declarations
+//Forward Declarations
 class ASeat;
 class AToilet;
 class UPaxState;
@@ -34,87 +34,74 @@ class PAXPROTO_API APax final : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+		virtual void BeginPlay() override;
 
 public:
 
-	// Sets default values for this character's properties
-	APax();
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+		APax();
+	
+		virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+		virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Cursor Interactions	////////////////////////////
-	void Clicked();
-	void Released();
-
+	//Utility Functions
+		void Clicked();
+		void Released();
+		void UpdateState()const;
+		void ManageTarget(AActor* Target);
+		void ManageTargetPost();
+		void AdaptSpeeds()const;
+	UFUNCTION(BlueprintNativeEvent)
+		void FoodOrder();
 	UFUNCTION(BlueprintCallable)
-	void SetDeployLocation(FVector Location);
+		void FoodOrderReset();
+
+	//Getters/Setters
 	UFUNCTION(BlueprintCallable)
-	FVector GetDeployLocation() const;
-
-	void SetPreMoveLocation(FTransform PaxOrientation);
-	FTransform GetPreMoveLocation()const;
-
-	void SetViewStatInfo(bool X);
+		void SetDeployLocation(FVector Location);
 	UFUNCTION(BlueprintCallable)
-	bool GetViewStatInfo()const;
-
-	void UpdateState()const;
-	void SetEnableStateUpdate(bool X);
-	bool GetEnableStateUpdate()const;
-
-	// Utility Functions	/////////////////////////////
-
-	void ManageTarget(AActor* Target);
-	void ManageTargetPost();
-	void AdaptSpeeds()const;
-
-	void SetSphereSpawnLocation(FVector Location);
-
+		FVector GetDeployLocation() const;
+		void SetPreMoveLocation(FTransform PaxOrientation);
+		FTransform GetPreMoveLocation()const;
+		void SetViewStatInfo(bool X);
 	UFUNCTION(BlueprintCallable)
-	FVector GetSphereSpawnLocation();
-
+		bool GetViewStatInfo()const;
+		void SetEnableStateUpdate(bool X);
+		bool GetEnableStateUpdate()const;
+		void SetSphereSpawnLocation(FVector Location);
 	UFUNCTION(BlueprintCallable)
-	void SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors);
-
+		FVector GetSphereSpawnLocation();
 	UFUNCTION(BlueprintCallable)
-	ETarget GetTargetPlace()const;
-
+		void SetInfluence(const TArray<AActor*>& NearbyActors, bool FoundActors);
 	UFUNCTION(BlueprintCallable)
-	EInfluenceAffect GetInfluenceAffect();
-	void SetInfluenceAffect(EInfluenceAffect Affect);
+		ETarget GetTargetPlace()const;
+	UFUNCTION(BlueprintCallable)
+		EInfluenceAffect GetInfluenceAffect();
+		void SetInfluenceAffect(EInfluenceAffect Affect);
+		void SetEnableTextureOverlay(bool X);//TODO confirm
+	UFUNCTION(BlueprintCallable)
+		bool GetEnableTextureOverlay();  //TODO confirm
 		
 	// Utility TICK Functions //////////////////////
 
-	void SetEnableTextureOverlay(bool X);//TODO confirm
-	UFUNCTION(BlueprintCallable)
-	bool GetEnableTextureOverlay();  //TODO confirm
-	void TargetAcquiring();
-	void SelfAcquiring();
-	void TargetSeatAcquiring();
-	void CurrentSeatAcquiring();
-	void ToiletAcquiring()const;
-	void CheckIsMoving()const;	
+		void TargetAcquiring();
+		void SelfAcquiring();
+		void TargetSeatAcquiring();
+		void CurrentSeatAcquiring();
+		void ToiletAcquiring()const;
+		void CheckIsMoving()const;	
 
-	UFUNCTION(BlueprintNativeEvent)
-	void FoodOrder();
-	UFUNCTION(BlueprintCallable)
-	void FoodOrderReset();
-
+	//Component Handles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAudioComponent* DeathScream = nullptr;
+		UAudioComponent* DeathScream = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAudioComponent* BlockedHuff = nullptr;
+		UAudioComponent* BlockedHuff = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAudioComponent* Accept = nullptr;
+		UAudioComponent* Accept = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAudioComponent* StatFillUp = nullptr;
+		UAudioComponent* StatFillUp = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UPaxState* State = nullptr;
+		UPaxState* State = nullptr;
 
 private:
 	
@@ -126,7 +113,7 @@ private:
 
 	ETarget TargetPlace;
 	UPROPERTY(VisibleAnywhere)
-	TEnumAsByte<EInfluenceAffect> InfluenceAffect;
+		TEnumAsByte<EInfluenceAffect> InfluenceAffect;
 
 	//Locations and offset targets (to avoid Pax targeting middle of a mesh)
 	FVector DeployLocation;
@@ -142,7 +129,6 @@ private:
 	ASeat* CurrentSeat = nullptr;
 	AToilet* Toilet = nullptr;
 	AToilet* CurrentToilet = nullptr;
-
 	ACabinManager* Manager = nullptr;
 	AWaitingArea* WaitingArea = nullptr;
 	ACart* Cart = nullptr;

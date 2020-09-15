@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #include "Seat.h"
 #include "TimerManager.h"
@@ -8,7 +8,6 @@
 #include "Containers/UnrealString.h"
 
 
-// Sets default values
 ASeat::ASeat()
 {
  	//Turned off tick due to many seats
@@ -37,21 +36,31 @@ ASeat::ASeat()
 
 }
 
-// Called when the game starts or when spawned
 void ASeat::BeginPlay()
 {
 	Super::BeginPlay();
 	IsUIEnabled = false;
 }
 
-// Called every frame
 void ASeat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("Ticking"));
 }
 
-//Called from player controller
+//Called from function in class
+void ASeat::UITimerExpired()
+{
+	//turn off UI
+	SetUIEnabled(false);
+}
+
+//Return UI state
+bool ASeat::GetUIEnabled()const
+{
+	return IsUIEnabled;
+}
+
+//Called from player controller when hoovered over
 void ASeat::SetUIEnabled(const bool X)
 {
 	//Enable flag for Widget to make UI visible
@@ -69,20 +78,8 @@ void ASeat::SetUIEnabled(const bool X)
 	}
 	
 }
-//Return UI state
-bool ASeat::GetUIEnabled()const
-{
-	return IsUIEnabled;
-}
-//Called from function in class
-void ASeat::UITimerExpired()
-{
-	//turn off UI
-	SetUIEnabled(false);
-}
 
-
-//Seat Seat ID
+//Get Seat ID from world outliner (last 2 digits)
 FString ASeat::GetSeatID()const
 {
 	return (this->GetName()).Mid(4,2);

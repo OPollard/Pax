@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #include "Pax.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -15,12 +15,11 @@
 #include "Cart.h"
 #include "Components/AudioComponent.h"
 
-// Sets default values
 APax::APax()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
+	//Configure components
 	State = CreateDefaultSubobject<UPaxState>(TEXT("State"));
 	DeathScream = CreateDefaultSubobject<UAudioComponent>(TEXT("Death Scream"));
 	BlockedHuff = CreateDefaultSubobject<UAudioComponent>(TEXT("Blocked Huff"));
@@ -28,7 +27,6 @@ APax::APax()
 	StatFillUp = CreateDefaultSubobject<UAudioComponent>(TEXT("Stat Fill Up "));
 }
 
-// Called when the game starts or when spawned
 void APax::BeginPlay()
 {
 	Super::BeginPlay();
@@ -105,14 +103,12 @@ void APax::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 //called from player controller
 void APax::Clicked()
 {
-		
 		SetPreMoveLocation(this->GetActorTransform());
 		State->ResetStates();
 		State->SetFloating(true);
 }
 void APax::Released()
 {
-		
 		State->SetFloating(false);
 		SetActorTransform(this->GetPreMoveLocation());
 }
@@ -427,7 +423,6 @@ void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActo
 		}
 	}
 }
-
 
 //set texture overlay toggle
 void APax::SetEnableTextureOverlay(bool X)

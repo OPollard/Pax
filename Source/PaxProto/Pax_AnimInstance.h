@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #pragma once
 
@@ -6,9 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "Pax_AnimInstance.generated.h"
 
-/**
- * 
- */
+//Forward Declarations
 class APax;
 class UPaxState;
 
@@ -17,6 +15,7 @@ class PAXPROTO_API UPax_AnimInstance final : public UAnimInstance
 {
 	GENERATED_BODY()
 public:
+
 	/** Is Floating */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PaxPosition)
 		bool IsFloating;
@@ -48,8 +47,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = PaxState)
 		void SetPaxWalkSpeed();
 
-public:
-
 	//Find owner of this animation as a pawn
 	APawn* OwningPawn = nullptr;
 	
@@ -59,8 +56,9 @@ public:
 	//Pax State Handle
 	UPaxState* PaxState = nullptr;
 	
-	virtual void NativeInitializeAnimation() override;
-
-	virtual void NativeUpdateAnimation(float DeltaTimeX) override;
+	//Equivalent BeginPlay()
+		virtual void NativeInitializeAnimation() override;
+	//Equivalent Tick()
+		virtual void NativeUpdateAnimation(float DeltaTimeX) override;
 
 };

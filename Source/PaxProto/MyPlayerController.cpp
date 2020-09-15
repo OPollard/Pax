@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 
 #include "MyPlayerController.h"
@@ -6,17 +6,16 @@
 #include "Pax.h"
 #include "Seat.h"
 
+//MACROS
 #define PAX ECollisionChannel::ECC_GameTraceChannel1 
 #define LOCATION ECollisionChannel::ECC_GameTraceChannel2 
 
-
-//set up settings
 AMyPlayerController::AMyPlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-	//input settings
+	//player input settings
 	bShowMouseCursor = true;
 	bEnableClickEvents = true;
 	bEnableMouseOverEvents = true;
@@ -30,8 +29,6 @@ void AMyPlayerController::BeginPlay()
 	Super::BeginPlay();
 }
 
-
-// Called to bind functionality to input
 void AMyPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -121,11 +118,9 @@ void AMyPlayerController::SearchForActorAtCursor(ECollisionChannel Trace)
 			EndLocation,
 			Trace);
 	}
-
 	//cast result to appropriate pointer
 	if (Trace == PAX) { PaxHandle = Cast<APax>(HitResult.GetActor()); }
 	if (Trace == LOCATION) { Target = HitResult.GetActor(); }
-
 }
 
 //Returns position for floating objects, will offset for camera angle

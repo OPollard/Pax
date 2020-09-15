@@ -1,10 +1,8 @@
-// Copyright of Night Owls 2020 - inclusive ©
-
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #include "Pax_AnimInstance.h"
 #include "Pax.h"
 #include "PaxState.h"
-
 
 void UPax_AnimInstance::NativeInitializeAnimation()
 {
@@ -17,7 +15,6 @@ void UPax_AnimInstance::NativeInitializeAnimation()
 	if (PaxPawn) { PaxState = PaxPawn->FindComponentByClass<UPaxState>(); }
 }
 
-//Tick
 void UPax_AnimInstance::NativeUpdateAnimation(float DeltaTimeX)
 {
 	//Very Important Line

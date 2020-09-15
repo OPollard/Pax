@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #pragma once
 
@@ -6,9 +6,6 @@
 #include "AIController.h"
 #include "Pax_AIController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PAXPROTO_API APax_AIController final : public AAIController
 {

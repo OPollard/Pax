@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #pragma once
 
@@ -10,25 +10,25 @@
 //Forward Declarations
 class AMoney;
 
-//Set the age group
+//Age group
 UENUM()
 enum EGeneration
 {	YOUNG, ADULT, OLD, NUMOFGENERATIONS	};
-
+//Level of politeness
 UENUM()
 enum EPoliteness
 {	UNSOCIAL, NEUTRAL, SOCIAL,NUMOFPOLITENESS };
-
+//Wealth category
 UENUM()
 enum EWealth
 {	POOR, AVERAGE, WEALTHY, RICH, NUMOFWEALTH };
-
+//UI indicator
 UENUM()
 enum EIndicator
 {	LARGEDECREASE = -2, SMALLDECREASE = -1, NOCHANGE = 0,
 	SMALLINCREASE = 1, LARGEINCREASE = 2, NUMOFINDICATORS };
 
-//Preprocessor Directive to construct a MACRO DELEGATE where this name is found
+//Delegate Declarations
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPaxDelegate);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -37,110 +37,89 @@ class PAXPROTO_API UPaxState final : public UActorComponent
 	GENERATED_BODY()
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+		virtual void BeginPlay() override;
 
 public:
-	// Sets default values for this component's properties
-	UPaxState();
+		UPaxState();
 
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+		virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	//Utility Functions
+		void Initialise();
+		void UpdateCores();
+		bool SpawnMoney()const;
+		void ResetStates();
+		bool IsAlive();
+		bool IsTired();
+		bool IsUncomfortable();
+		void ResetDeltaSum();
 
-	//Delegate to be broadcast across the game
+	//Core Getters/Setters
+	UFUNCTION(BlueprintPure)
+		EGeneration GetAgeGroup()const;
+	UFUNCTION(BlueprintPure)
+		EPoliteness GetPoliteness()const;
+	UFUNCTION(BlueprintPure)
+		int32 GetAge()const;
+	UFUNCTION(BlueprintPure)
+		FString GetName()const;
+		void SetNutrition(float Value);
+	UFUNCTION(BlueprintPure)
+		float GetNutrition()const;
+	UFUNCTION(BlueprintPure)
+		int32 GetNutritionIndicator()const;
+		void SetExcrement(float Value);
+	UFUNCTION(BlueprintPure)
+		float GetExcrement()const;
+	UFUNCTION(BlueprintPure)
+		int32 GetExcrementIndicator()const;
+	UFUNCTION(BlueprintPure)	
+		float GetSocietal()const;	
+	UFUNCTION(BlueprintPure)
+		int32 GetSocialIndicator()const;
+		void SetSocialBias(float Value);
+		void SetEnergy(float Value);
+	UFUNCTION(BlueprintPure)
+		float GetEnergy()const;
+	UFUNCTION(BlueprintPure)
+		int32 GetEnergyIndicator() const;
+		void SetAnnouncedSleep(bool X);
+	UFUNCTION(BlueprintPure)
+		float GetAnimPlaySpeed()const;
+		void SetAnimPlaySpeed(float WalkSpeed);
+
+	//Status Getters/Setters
+		void SetOnboard(bool X);
+		bool GetOnboard()const;
+		void SetSitting(bool X);
+	UFUNCTION(BlueprintPure)
+		bool GetSitting()const;
+		void SetFloating(bool X);
+	UFUNCTION(BlueprintPure)
+		bool GetFloating()const;
+		void SetInToilet(bool X);
+		bool GetInToilet()const;
+	UFUNCTION(BlueprintCallable)
+		void SetMoving(bool X);
+	UFUNCTION(BlueprintPure)
+		bool GetMoving()const;
+		void SetWaitArea(bool X);
+		bool GetWaitArea()const;
+
+	//Money Getters/Setters
+	UFUNCTION(BlueprintPure)
+		FText GetMoneyAsText()const;
+		float GetMoney()const;
+		void SetMoney(float X);
+		int GetDeltaSum()const;
+		void SetAwaitingPickUp(bool X);
+		bool GetAwaitingPickup()const;
+
+	//Delegates to be broadcast across the game
 	FPaxDelegate OnDeath;
 	FPaxDelegate Sleep;
 
-	void Initialise();
-
-	void UpdateCores();
-
-	bool SpawnMoney()const;
-
-	UFUNCTION(BlueprintPure)
-	EGeneration GetAgeGroup()const;
-	
-	UFUNCTION(BlueprintPure)
-	EPoliteness GetPoliteness()const;
-
-	UFUNCTION(BlueprintPure)
-	int32 GetAge()const;
-
-	UFUNCTION(BlueprintPure)
-	FString GetName()const;
-
-	//Change indicator code so that it returns a state of increase or
-	//decrease such as big decrease -2, small decrease -1, neutral 0 etc
-	void SetNutrition(float Value);
-	UFUNCTION(BlueprintPure)
-	float GetNutrition()const;
-	UFUNCTION(BlueprintPure)
-	int32 GetNutritionIndicator()const;
-
-	void SetExcrement(float Value);
-	UFUNCTION(BlueprintPure)
-	float GetExcrement()const;
-	UFUNCTION(BlueprintPure)
-	int32 GetExcrementIndicator()const;
-
-	UFUNCTION(BlueprintPure)
-	float GetSocietal()const;
-	UFUNCTION(BlueprintPure)
-	int32 GetSocialIndicator()const;
-	void SetSocialBias(float Value);
-
-	void SetEnergy(float Value);
-	UFUNCTION(BlueprintPure)
-	float GetEnergy()const;
-	UFUNCTION(BlueprintPure)
-	int32 GetEnergyIndicator() const;
-	void SetAnnouncedSleep(bool X);
-
-	UFUNCTION(BlueprintPure)
-	float GetAnimPlaySpeed()const;
-
-	void SetAnimPlaySpeed(float WalkSpeed);
-
-	// Status Functions	///
-	void ResetStates();
-
-	void SetOnboard(bool X);
-	bool GetOnboard()const;
-
-	void SetSitting(bool X);
-	UFUNCTION(BlueprintPure)
-	bool GetSitting()const;
-
-	void SetFloating(bool X);
-	UFUNCTION(BlueprintPure)
-	bool GetFloating()const;
-
-	void SetInToilet(bool X);
-	bool GetInToilet()const;
-	UFUNCTION(BlueprintCallable)
-	void SetMoving(bool X);
-
-	UFUNCTION(BlueprintPure)
-	bool GetMoving()const;
-
-	void SetWaitArea(bool X);
-	bool GetWaitArea()const;
-
-	UFUNCTION(BlueprintPure)
-	FText GetMoneyAsText()const;
-	float GetMoney()const;
-	void SetMoney(float X);
-
-	void ResetDeltaSum();
-	int GetDeltaSum()const;
-
-	void SetAwaitingPickUp(bool X);
-	bool GetAwaitingPickup()const;
-
-	bool IsAlive();
-	bool IsTired();
-	bool IsUncomfortable();
-	
+	//Types
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<AMoney> MoneyActor;
 
@@ -148,11 +127,11 @@ private:
 
 	int32 Age{ 0 };
 	UPROPERTY(VisibleAnywhere)
-	TEnumAsByte<EGeneration> AgeGroup;
+		TEnumAsByte<EGeneration> AgeGroup;
 	UPROPERTY(VisibleAnywhere)
-	TEnumAsByte<EPoliteness> Politeness;
+		TEnumAsByte<EPoliteness> Politeness;
 	UPROPERTY(VisibleAnywhere)
-	TEnumAsByte<EWealth> Wealthiness;
+		TEnumAsByte<EWealth> Wealthiness;
 	UPROPERTY(VisibleAnywhere)
 	float Money{ 0.0f };
 

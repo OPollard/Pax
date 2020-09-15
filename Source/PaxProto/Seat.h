@@ -1,4 +1,4 @@
-// Copyright of Night Owls 2020 - inclusive ©
+// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #pragma once
 
@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Seat.generated.h"
 
-
+//Forward Declarations
 class UBoxComponent;
 class UPointLightComponent;
 
@@ -16,37 +16,39 @@ class PAXPROTO_API ASeat final : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
-	ASeat();
+	
+		ASeat();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+		virtual void Tick(float DeltaTime) override;
 
-	void SetUIEnabled(bool X);
+	//Utility Functions
+		void UITimerExpired();
+
+	//Getters/Setters
 	UFUNCTION(BlueprintCallable)
-	bool GetUIEnabled()const;
-	void UITimerExpired();
-
+		void SetUIEnabled(bool X);
+	UFUNCTION(BlueprintCallable)
+		bool GetUIEnabled()const;
 	UFUNCTION(BlueprintPure)
-	FString GetSeatID()const;
-
-	void SetOccupied(bool X);
+		FString GetSeatID()const;
+	UFUNCTION(BlueprintCallable)
+		void SetOccupied(bool X);
 	UFUNCTION(BlueprintPure)
-	bool GetOccupied()const;
+		bool GetOccupied()const;
+	
+	//Component Handles
+	UPROPERTY(EditAnywhere, Category = "Seat")
+		UBoxComponent* CollisionBox = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Seat")
+		UPointLightComponent* IndicatorLight = nullptr;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+		virtual void BeginPlay() override;
 
 private:
 
 	FTimerHandle UITimer;
-
-	UPROPERTY(EditAnywhere, Category = "Seat")
-	UBoxComponent* CollisionBox = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Seat")
-	UPointLightComponent* IndicatorLight = nullptr;
 
 	bool IsOccupied{ false };
 	bool IsUIEnabled{ false };

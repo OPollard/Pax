@@ -1,4 +1,4 @@
-﻿// Copyright of Night Owls 2020 - inclusive ©
+﻿// Copyright of Codebird Ltd 2020 - inclusive © 
 
 #include "PaxState.h"
 #include "Constants.h"
@@ -14,20 +14,17 @@ UPaxState::UPaxState()
 	MoneyActor = MoneyActorClassFinder.Object;
 }
 
-
 void UPaxState::BeginPlay()
 {
 	Super::BeginPlay();
 
 	//set up stats on spawn
 	Initialise();
-	
 }
 
 void UPaxState::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 }
 
 
@@ -89,13 +86,11 @@ void UPaxState::Initialise()
 		default:
 			break;
 	}
-		
 }
 
 // Called every second from Pax.cpp
 void UPaxState::UpdateCores()
 {
-			
 		//If not alive
 		if (!IsAlive())
 		{
