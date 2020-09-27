@@ -6,6 +6,12 @@
 #include "GameFramework/GameModeBase.h"
 #include "PaxProtoGameModeBase.generated.h"
 
+UENUM()
+enum ELevel
+{
+	MENU, VENUS, EARTH, MARS, NUMOFLEVELS
+};
+
 UCLASS()
 class PAXPROTO_API APaxProtoGameModeBase final : public AGameModeBase
 {
@@ -21,6 +27,14 @@ public:
 
 	~APaxProtoGameModeBase();
 
+	UFUNCTION(BlueprintCallable)
+		ELevel GetCurrentLevel();
+
+	UFUNCTION(BlueprintCallable)
+		ELevel ChooseRandomLevel();
+
 private:
+
+	static ELevel CurrentLevel;
 	
-};
+}; ELevel APaxProtoGameModeBase::CurrentLevel = ELevel::MENU;

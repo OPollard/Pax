@@ -26,6 +26,19 @@ void APaxProtoGameModeBase::Tick(float DeltaTime)
 
 }
 
+// Return current level
+ELevel APaxProtoGameModeBase::GetCurrentLevel()
+{
+	return CurrentLevel;
+}
+
+// Select random level from level list
+ELevel APaxProtoGameModeBase::ChooseRandomLevel()
+{
+	CurrentLevel = static_cast<ELevel>(FMath::RandRange(MENU +1, ELevel::NUMOFLEVELS -1));
+	return CurrentLevel;
+}
+
 APaxProtoGameModeBase::~APaxProtoGameModeBase()
 {
 ;
