@@ -77,6 +77,7 @@ public:
 		ETarget GetTargetPlace()const;
 	UFUNCTION(BlueprintCallable)
 		EInfluenceAffect GetInfluenceAffect();
+	UFUNCTION(BlueprintCallable)
 		void SetInfluenceAffect(EInfluenceAffect Affect);
 		void SetEnableTextureOverlay(bool X);//TODO confirm
 	UFUNCTION(BlueprintCallable)

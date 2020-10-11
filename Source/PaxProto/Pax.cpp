@@ -39,6 +39,8 @@ void APax::BeginPlay()
 	EnableTextureOverlay = false;
 	FoodRequest = false;
 
+	InfluenceAffect = EInfluenceAffect::NONE;
+
 	//Calibrate Offsets
 	SeatDeployLocationOffset = FVector(0.0f, 40.0f, 0.0f);
 	ToiletDeployLocationOffset = FVector(120.0f, 0.0f, 0.0f);
@@ -82,7 +84,6 @@ void APax::Tick(float DeltaTime)
 //function called when abeam cart
 void APax::FoodOrder_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("YUMMY"));
 	State->SetNutrition(100.0f);
 	StatFillUp->Play();
 	FoodRequest = true;
@@ -188,7 +189,7 @@ void APax::ManageTarget(AActor* Target)
 					if (!TargetSeat->GetOccupied())
 					{
 						//do additional checks to avoid it occupying a seat but never making it due to path
-
+						TargetPlace = ETarget::TARGETSEAT;
 						//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
 						if (FVector::Dist(TargetSeat->GetActorLocation(), this->GetActorLocation()) > 60.0f)
 						{
@@ -222,7 +223,7 @@ void APax::ManageTarget(AActor* Target)
 					if (!Toilet->GetOccupied())
 					{
 						//do additional checks to avoid it occupying a seat but never making it due to path
-
+						TargetPlace = ETarget::TOILET;
 						//stands pax up off seat if seat is further away then next to it and not on initial placement from a non-seat like an airbridge
 						if (FVector::Dist(Toilet->GetActorLocation(), this->GetActorLocation()) > 60.0f)
 						{
@@ -247,6 +248,7 @@ void APax::ManageTarget(AActor* Target)
 				{
 					if (!WaitingArea->GetOccupied())
 					{
+						TargetPlace = ETarget::WAITINGAREA;
 						//path accepted sound
 						Accept->Play();
 
@@ -268,13 +270,14 @@ void APax::ManageTargetPost()
 	if (TargetSeat)
 	{
 		//Set deploy location and target so we can make this a nullptr
-		SetDeployLocation(TargetSeat->GetActorLocation());
+		//SetDeployLocation(TargetSeat->GetActorLocation());
+		this->SetActorLocation(TargetSeat->GetActorLocation());
 		//Remove Occupancy of previous seat
 		if (CurrentSeat) CurrentSeat->SetOccupied(false);
 		//Important for correct path, turned to false when sat down
 		this->SetCanAffectNavigationGeneration(true);
 		//Redirect path for tick
-		TargetPlace = ETarget::TARGETSEAT;
+		
 
 		//Cabin Manager needs to know about the new pax OnBoard
 		if (!State->GetOnboard())
@@ -288,11 +291,12 @@ void APax::ManageTargetPost()
 	else if (Toilet)
 	{
 		//Set deploy location and target so we can make this a nullptr
-		SetDeployLocation(Toilet->GetActorLocation() + ToiletDeployLocationOffset);
+		//SetDeployLocation(Toilet->GetActorLocation() + ToiletDeployLocationOffset);
+		this->SetActorLocation(Toilet->GetActorLocation());
 		//	Toilet->SetOccupied(false);
 		//Remove Occupancy of previous seat
 		if (CurrentSeat) CurrentSeat->SetOccupied(false);
-		TargetPlace = ETarget::TOILET;
+		
 
 		//Cabin manager will need to know who is in the toilet TODO
 		if (!State->GetOnboard())
@@ -307,8 +311,9 @@ void APax::ManageTargetPost()
 	else if(WaitingArea)
 	{
 		//Set deploy location and target so we can make this a nullptr
-		SetDeployLocation(WaitingArea->GetActorLocation());
-		TargetPlace = ETarget::WAITINGAREA;
+		//SetDeployLocation(WaitingArea->GetActorLocation());
+		this->SetActorLocation(WaitingArea->GetActorLocation());
+		
 		//Remove previous occupancy
 		if (CurrentSeat) CurrentSeat->SetOccupied(false);
 		//New occupancy triggered on overlap
@@ -375,6 +380,8 @@ void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActo
 		for (int i{ 0 }; i < NumOfActors; ++i)
 		{
 			float Bias{ 0 };
+			FString PaxName = NearbyActors[i]->GetName();
+			UE_LOG(LogTemp, Warning, TEXT("%i = %s"),i, *PaxName);
 			//Get its pax state handle
 			if (UPaxState* ActorState = NearbyActors[i]->FindComponentByClass<UPaxState>())
 			{
@@ -405,15 +412,20 @@ void APax::SetInfluence(const TArray<AActor*>& NearbyActors,const bool FoundActo
 			APax* NearbyPax = Cast<APax>(NearbyActors[i]);
 			if (NearbyPax)
 			{
-				//Set influence state appropriately, to trigger correct overlay
-				if (Bias > 0.0f) NearbyPax->SetInfluenceAffect(EInfluenceAffect::POSITIVE);
-				else if (Bias < 0.0f) NearbyPax->SetInfluenceAffect(EInfluenceAffect::NEGATIVE);
-				else NearbyPax->SetInfluenceAffect(EInfluenceAffect::NONE);
+				if (EnableTextureOverlay)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Setting Influence"));
+					//Set influence state appropriately, to trigger correct overlay
+					if (Bias > 0.001f) NearbyPax->SetInfluenceAffect(EInfluenceAffect::POSITIVE);
+					else if (Bias < -0.001f) 	NearbyPax->SetInfluenceAffect(EInfluenceAffect::NEGATIVE);
+					else	NearbyPax->SetInfluenceAffect(EInfluenceAffect::NONE);
+				}
 				//if the found actor is sitting down, enable overlay
 				if(State->GetFloating() || EnableStatInfo) NearbyPax->SetEnableTextureOverlay(true);
 			}
 			//DISTANCE MODIFIER
 			Bias = Bias - (Bias * (FMath::Clamp((GetDistanceTo(NearbyActors[i])), 0.0f, INFLUENCE_RANGE) / INFLUENCE_RANGE));
+			
 			//Sum Up All Nearby Actors Influence
 			GroupBias += Bias;
 			//Create Average Bias over all overlapping actors

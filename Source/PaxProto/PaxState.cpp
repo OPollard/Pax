@@ -34,8 +34,9 @@ void UPaxState::Initialise()
 	//Randomise Name and Age on Spawn
 	Name = Names[FMath::RandRange(0, (Names.Num()-1))];
 	Age = FMath::RandRange(1, 80);
-	//Randomise Wealth and Politeness on Spawn
-	Politeness = static_cast<EPoliteness>(FMath::RandRange(0, EPoliteness::NUMOFPOLITENESS-1));
+	//Randomise Wealth and Politeness on Spawn - TEMP neutralised 
+	//Politeness = static_cast<EPoliteness>(FMath::RandRange(0, EPoliteness::NUMOFPOLITENESS-1));
+	Politeness = EPoliteness::NEUTRAL;
 	Wealthiness = static_cast<EWealth>(FMath::RandRange(0, EWealth::NUMOFWEALTH-1));
 	//Set Enum Depending on Age Result
 	if (Age >= 0 && Age < 12) { AgeGroup = EGeneration::YOUNG; }
